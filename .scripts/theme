@@ -1,0 +1,6 @@
+#!/bin/sh
+# alacritty theme picker
+
+theme_path=$(find ~/.config/alacritty_themes -type f | fzf-tmux -p -i --preview='echo "import:
+ - {}" > ~/.config/current_alacritty_theme.yml
+touch ~/.config/alacritty.yml && neofetch')

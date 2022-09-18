@@ -1,0 +1,12 @@
+#!/bin/sh
+# alacritty font picker
+
+# fc-list :mono | awk -F ':' '{print $2}' | sort | uniq | fzf-tmux -p -i --preview='echo "font:
+#   normal:
+#     family: {}" > ~/.config/current_alacritty_font.yml
+# touch ~/.config/alacritty.yml && neofetch'
+
+fc-list | awk -F ':' '{print $2}' | sort | uniq | fzf-tmux -p -i --preview='echo "font:
+  normal:
+    family: {}" > ~/.config/current_alacritty_font.yml
+touch ~/.config/alacritty.yml && neofetch'
