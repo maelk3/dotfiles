@@ -1,0 +1,24 @@
+set statusbar-h-padding 0
+set statusbar-v-padding 0
+set page-padding 1
+
+set recolor
+
+map <C-w>  adjust_window best-fit
+
+set font "iosevka 16"
+
+map <C-n> scroll down
+map <C-p> scroll up
+map <C-f> scroll right
+map <C-b> scroll left
+
+map u scroll half-up
+map d scroll half-down
+
+map < scroll full-up
+map > scroll full-down
+
+map n navigate next
+map p navigate previous
+
