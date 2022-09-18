@@ -98,6 +98,9 @@
 (if (daemonp)
     (setq initial-major-mode 'org-mode))
 
+(use-package autothemer
+  :ensure t)
+
 (use-package consult
   :ensure t
   :bind ("C-x b" . consult-buffer)

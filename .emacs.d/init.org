@@ -213,6 +213,13 @@ provides fuzzy finding.
 #+end_src
 
 ** Miscellaneous
+*** Autothemer
+
+#+begin_src emacs-lisp
+  (use-package autothemer
+    :ensure t)
+#+end_src
+
 *** Consult
 
 The consult package provides many commands such as a better switch
