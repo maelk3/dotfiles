@@ -1,0 +1,349 @@
+#+title: Emacs configuration file
+#+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
+
+* Base configuration
+
+** Package system setup
+
+We begin by loading the ~package~ package and the melpa package
+archive and initialize it.
+
+#+begin_src emacs-lisp
+  (require 'package)
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+			   ("org" . "https://orgmode.org/elpa/")
+			   ("elpa" . "https://elpa.gnu.org/packages/")))
+  (package-initialize)
+#+end_src
+
+We then ensure that =use-package= is installed. This package allows
+easy compact configuration for all packages. It also ensure that all
+packages are installed. That way, when used on another system, it
+downloads packages automatically.
+
+#+begin_src emacs-lisp
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+#+end_src
+
+We relocate the custom file to =~/.emacs.d/custom.el=. This file is
+used whenever we set a custom variable in emacs, such as selecting a
+font or customizing a font face.
+
+#+begin_src emacs-lisp
+    (setq custom-file "~/.emacs.d/custom.el") ;; set custom file to ~/.emacs.d/custom.el
+    (load custom-file)                        ;; load the custom file
+#+end_src
+
+** Basic UI configuration
+
+We disable the *tool bar*, *menu bar* and the *scoll bar*.
+
+#+begin_src emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (customize-set-variable 'scroll-bar-mode nil)
+  (customize-set-variable 'horizontal-scroll-bar-mode nil)
+#+end_src
+
+ We also enable the mouse support in GUI emacs and set up mouse wheel
+scroll speed.
+
+#+begin_src emacs-lisp
+  (xterm-mouse-mode 1)                     ;; enable mouse
+  (setq mouse-wheel-scroll-amount '(0.07)) ;; change scroll speed
+  (setq mouse-wheel-progressive-speed nil) ;; disable smooth scroll
+  (setq ring-bell-function 'ignore)        ;; disable bell sound
+  (setq scroll-step 1)                     ;; smooth scrolling
+#+end_src
+
+We setup a better window vertical split symbol in terminal emacs to
+the pipe symbol. We also disable the superscript in LaTeX mode.
+
+#+begin_src emacs-lisp
+  (set-face-inverse-video-p 'vertical-border nil)
+  (set-face-background 'vertical-border (face-background 'default))
+  (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?┃))  
+#+end_src
+
+We enable the line numbers and set up the fringe on the programming
+and LaTeX modes.
+
+We also disable the close button for emacs tabs.
+
+#+begin_src emacs-lisp
+  (setq tex-fontify-script nil)
+  (setq font-latex-fontify-script nil)
+
+  (fringe-mode 10)
+
+  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'latex-mode-hook  #'display-line-numbers-mode)
+  (global-set-key (kbd "C-x C-l") 'display-line-numbers)
+
+  (setq tab-bar-close-button-show nil)
+  (setq tab-bar-new-button-show nil)
+#+end_src
+
+* Package specific configuration
+** Git
+*** Magit
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :ensure t)
+#+end_src
+
+** Julia
+*** Julia-mode
+
+#+begin_src emacs-lisp
+  (use-package julia-mode
+    :ensure t)
+#+end_src
+
+*** Julia-repl
+
+#+begin_src emacs-lisp
+  (use-package julia-repl
+    :ensure t
+    :config (add-to-list 'load-path "/usr/bin/julia")
+    :hook (julia-mode . julia-repl-mode))
+#+end_src
+
+** Modeline
+*** All the icons
+
+Support for icons used in the doom modeline.
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons
+    :config (setq all-the-icons-scale-factor 1.0)
+            (setq all-the-icons-fileicon-scale-factor 1.0))
+#+end_src
+
+*** Doom modeline
+
+The doom modeline provides a more aesthetic modeline with git status.
+
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :ensure t
+    :config (doom-modeline-mode 1)
+            (setq doom-modeline-height 35))
+#+end_src
+
+** Minibuffer
+*** FZF
+
+#+begin_src emacs-lisp
+    (use-package fzf
+    :ensure t
+    :bind (("C-x f" . fzf-find-file)
+           ("C-x c" . cd)))
+#+end_src
+
+*** Vertico
+
+Vertico mode allows a better mini buffer with a comprehensive lisp of
+command completion. It works in tandem with marginelia to give
+supplement information such as keybindings and description of
+functions. Furthermore, it can be used with orderless to provide a
+fuzzy finder command completion.
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    :config (vertico-mode)
+            (setq vertico-cycle t))
+#+end_src
+
+*** Marginelia
+
+Marginelia provides supplementary informations in the minibuffer when
+used with the vertico mode.
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :bind (("M-A" . marginalia-cycle)
+	   :map minibuffer-local-map
+	   ("M-A" . marginalia-cycle))
+    :init (marginalia-mode))
+#+end_src
+
+*** Orderless
+
+Orderless is a completion framework used in the minibuffer that
+provides fuzzy finding.
+
+#+begin_src emacs-lisp
+  (use-package orderless
+             :ensure t
+             :custom
+             ((completion-styles '(orderless basic))
+             (completion-category-overrides '((file (styles basic partial-completion))))))
+#+end_src
+
+** Org mode
+*** Org-bullets
+
+#+begin_src emacs-lisp
+  (use-package org-bullets
+    :after (org)
+    :ensure t)
+#+end_src
+
+*** Org-mode
+
+#+begin_src emacs-lisp
+  (use-package org
+    :ensure t
+    :hook (org-mode . org-bullets-mode)
+    :config (setq org-agenda-files '("~/org/"))
+            (setq org-agenda-start-with-log-mode t)
+            (setq org-log-done 'time)
+            (setq org-log-into-drawer t)
+    :bind ("C-c l" . org-store-link)
+          ("C-c a" . org-agenda)
+          ("C-c c" . org-capture))
+
+  (if (daemonp)
+      (setq initial-major-mode 'org-mode))
+#+end_src
+
+** Miscellaneous
+*** Consult
+
+The consult package provides many commands such as a better switch
+buffer command ~consult-buffer~ that adds a live preview of the
+currently selection buffer in the minibuffer list. Many more useful
+commands such as ~consult-yank-pop~, ~consult-{theme,man,line,imenu}~
+are either used via the minibuffer are bound to keybindings.
+
+#+begin_src emacs-lisp
+    (use-package consult
+      :ensure t
+      :bind ("C-x b" . consult-buffer)
+	     ("C-x C-b" . consult-buffer-other-window)
+	     ("C-x p b" . consult-project-buffer)
+	     ("C-c s" . consult-imenu-multi)
+	     ("M-y" . consult-yank-pop)
+	     ("M-s" . consult-line)
+	     ("C-c C-f" . consult-file-externally))
+#+end_src
+
+*** Pdf-tools
+
+Pdf-tools provides a better alternative to the doc-view mode. It
+allows to load pdfs quickly and also provides a dark theme that adapts
+to the current theme background. It provides with an outline of the
+document (if provided in the meta-data of the .pdf). The only drawback
+of this mode is that it needs to be loaded (either on startup in
+daemon mode or before opening a pdf document) and the load time is non
+negligeable.
+
+#+begin_src emacs-lisp
+    (use-package pdf-tools
+      :ensure t
+      :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode))
+
+    (if (daemonp)
+	(pdf-tools-install))
+#+end_src
+
+*** Vterm
+
+We ensure the vterm package and set the keybinding ~M-T~ to open a new
+terminal buffer.
+
+#+begin_src emacs-lisp
+     (use-package vterm
+       :ensure t
+       :bind ("M-T" . vterm))
+#+end_src
+
+*** Rainbow-mode
+
+#+begin_src emacs-lisp
+  (use-package rainbow-mode
+    :ensure t)
+#+end_src
+
+*** Transpose-frame
+
+The =transpose-frame= package provide commands to do windows
+manipulation.
+
+#+begin_src emacs-lisp
+  (use-package transpose-frame
+    :ensure t)
+#+end_src
+
+We modify the window movement commands defined in the
+=transpose-frame= package to =cycle= in the four direction and we
+bound these modification to the keybindings ~M-{n,p,f,b}~ for changing
+frame and ~M-{N,P,F,B}~ for switching buffers.
+
+#+begin_src emacs-lisp
+  (defun my/windmove-right ()
+    "change focus to the window on the right it is exists, otherwise change focus to the left"
+    (interactive)
+    (cond
+     ((window-in-direction 'right) (windmove-right))
+     ((window-in-direction 'left)  (windmove-left))))
+
+  (defun my/windmove-left ()
+    "change focus to the window on the left it is exists, otherwise change focus to the right"
+    (interactive)
+    (cond
+     ((window-in-direction 'left) (windmove-left))
+     ((window-in-direction 'right)  (windmove-right))))
+
+  (defun my/windmove-up ()
+    "change focus to the window above it is exists, otherwise change focus to the window below"
+    (interactive)
+    (cond
+     ((window-in-direction 'above) (windmove-up))
+     ((window-in-direction 'below)  (windmove-down))))
+
+  (defun my/windmove-down ()
+    "change focus to the window below it is exists, otherwise change focus to the window above"
+    (interactive)
+    (cond
+     ((window-in-direction 'below) (windmove-down))
+     ((window-in-direction 'above)  (windmove-up))))
+
+
+  ;; unbind clone buffer in info mode and bind windmove down
+  (add-hook 'Info-mode-hook (lambda () (progn (local-unset-key (kbd "M-n"))
+					      (local-set-key (kbd "M-n") 'my/windmove-down))))
+
+  (global-set-key (kbd "M-n") 'my/windmove-down)
+  (global-set-key (kbd "M-p") 'my/windmove-up)
+  (global-set-key (kbd "M-f") 'my/windmove-right)
+  (global-set-key (kbd "M-b") 'my/windmove-left)
+
+  (global-set-key (kbd "M-N") 'flip-frame)
+  (global-set-key (kbd "M-P") 'flip-frame)
+  (global-set-key (kbd "M-F") 'flop-frame)
+  (global-set-key (kbd "M-B") 'flop-frame)
+  (global-set-key (kbd "M-R") 'transpose-frame)
+
+#+end_src
+
+*** Xclip
+
+We use ~xclip-mode~ to be able to copy/paste in and out of emacs.
+
+#+begin_src emacs-lisp
+  (use-package xclip
+    :ensure t
+    :config (xclip-mode t))
+  #+end_src
+
+
+;; Local Variables:
+;; eval: (add-hook 'after-save-hook (lambda ()(if (y-or-n-p "Reload?")(load-file user-init-file))) nil t)
+;; eval: (add-hook 'after-save-hook (lambda ()(if (y-or-n-p "Tangle?")(org-babel-tangle))) nil t)
+;; End:
