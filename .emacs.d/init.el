@@ -106,7 +106,7 @@
 	 ("C-c s" . consult-imenu-multi)
 	 ("M-y" . consult-yank-pop)
 	 ("M-s" . consult-line)
-	 ("C-c C-f" . consult-file-externally))
+	 ("C-c o" . consult-file-externally))
 
 (use-package pdf-tools
   :ensure t

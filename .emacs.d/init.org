@@ -230,7 +230,7 @@ are either used via the minibuffer are bound to keybindings.
 	     ("C-c s" . consult-imenu-multi)
 	     ("M-y" . consult-yank-pop)
 	     ("M-s" . consult-line)
-	     ("C-c C-f" . consult-file-externally))
+	     ("C-c o" . consult-file-externally))
 #+end_src
 
 *** Pdf-tools
