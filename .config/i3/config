@@ -194,6 +194,7 @@ exec "feh --bg-scale ~/wallpaper/clayman.jpg"
 # exec "feh --bg-scale ~/wallpaper/image.jpg"
 
 bindsym $mod+w sticky toggle
+bindsym $mod+m exec --no-startup-id polybar-msg cmd toggle
 
 exec_always --no-startup-id picom &
 
