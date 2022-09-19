@@ -189,9 +189,7 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 default_border pixel 1
 
 exec "setxkbmap fr"
-# exec "feh --bg-scale ~/wallpaper/wallpaper4.jpg"
-exec "feh --bg-scale ~/wallpaper/clayman.jpg"
-# exec "feh --bg-scale ~/wallpaper/image.jpg"
+exec "feh --bg-scale ~/wallpaper/wallpaper_abstract.jpg"
 
 bindsym $mod+w sticky toggle
 bindsym $mod+m exec --no-startup-id polybar-msg cmd toggle
@@ -210,4 +208,4 @@ client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 
 client.background       #ffffff
 
-gaps inner 0
+gaps inner 20
