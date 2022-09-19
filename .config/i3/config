@@ -186,7 +186,7 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 #         status_command i3status
 # }
 
-default_border pixel 1
+default_border pixel 2
 
 exec "setxkbmap fr"
 exec "feh --bg-scale ~/wallpaper/wallpaper_abstract.jpg"
