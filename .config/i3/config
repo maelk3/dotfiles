@@ -189,7 +189,8 @@ bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcu
 default_border pixel 2
 
 exec "setxkbmap fr"
-exec "feh --bg-scale ~/wallpaper/wallpaper_abstract.jpg"
+exec "~/.config/i3/current_wallpaper"
+# exec "feh --bg-scale ~/wallpaper/wallpaper_macos.jpg"
 
 bindsym $mod+w sticky toggle
 bindsym $mod+m exec --no-startup-id polybar-msg cmd toggle
@@ -198,6 +199,7 @@ exec_always --no-startup-id picom &
 
 # polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh
+bindsym $mod+Shift+z exec "polybar-msg cmd restart"
 
 # class                 border  backgr. text    indicator child_border
 client.focused          #ffffff #666666 #ffffff #999999   #999999
@@ -208,4 +210,4 @@ client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 
 client.background       #ffffff
 
-gaps inner 20
+gaps inner 15
