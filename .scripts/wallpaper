@@ -3,6 +3,10 @@
 
 wallpaper_path=$(find ~/wallpaper -type f | fzf-tmux -p -i --preview='feh --bg-scale {}')
 
-[ -z "$wallpaper_path" ] || (echo "#!/bin/sh
-feh --bg-scale $wallpaper_path" > ~/.config/i3/current_wallpaper)
-
+if [ -z "$wallpaper_path" ]
+then
+    ~/.config/i3/current_wallpaper
+else
+    echo "#!/bin/sh
+feh --bg-scale $wallpaper_path" > ~/.config/i3/current_wallpaper        
+fi

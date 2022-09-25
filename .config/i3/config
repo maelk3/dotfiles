@@ -190,7 +190,6 @@ default_border pixel 2
 
 exec "setxkbmap fr"
 exec "~/.config/i3/current_wallpaper"
-# exec "feh --bg-scale ~/wallpaper/wallpaper_macos.jpg"
 
 bindsym $mod+w sticky toggle
 bindsym $mod+m exec --no-startup-id polybar-msg cmd toggle
