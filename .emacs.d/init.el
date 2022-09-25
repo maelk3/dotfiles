@@ -57,7 +57,8 @@
 (use-package doom-modeline
   :ensure t
   :config (doom-modeline-mode 1)
-          (setq doom-modeline-height 35))
+	  (setq doom-modeline-height 35)
+	  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package fzf
 :ensure t

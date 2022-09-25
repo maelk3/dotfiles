@@ -129,10 +129,11 @@ Support for icons used in the doom modeline.
 The doom modeline provides a more aesthetic modeline with git status.
 
 #+begin_src emacs-lisp
-  (use-package doom-modeline
-    :ensure t
-    :config (doom-modeline-mode 1)
-            (setq doom-modeline-height 35))
+    (use-package doom-modeline
+      :ensure t
+      :config (doom-modeline-mode 1)
+	      (setq doom-modeline-height 35)
+	      (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 #+end_src
 
 ** Minibuffer
