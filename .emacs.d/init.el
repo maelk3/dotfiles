@@ -30,14 +30,23 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(fringe-mode 10)
+(fringe-mode 0)
 
+(add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'latex-mode-hook  #'display-line-numbers-mode)
 (global-set-key (kbd "C-x C-l") 'display-line-numbers)
 
 (setq tab-bar-close-button-show nil)
 (setq tab-bar-new-button-show nil)
+
+(global-set-key (kbd "M-o") 'other-window)
+
+(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
+(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-18")
+(set-face-attribute 'default nil :font "PragmataPro Mono Liga-18")
+
+(load-theme 'modus-vivendi)
 
 (use-package magit
   :ensure t)
@@ -59,6 +68,64 @@
   :config (doom-modeline-mode 1)
 	  (setq doom-modeline-height 35)
 	  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+
+(use-package corfu
+  :ensure t
+  ;; Optional customizations
+  :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode))
+
+(use-package kind-icon
+  :ensure t
+  :after corfu
+  :custom
+  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+  :config
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+
+(use-package embark
+  :ensure t
+
+  :bind
+  (("C-;" . embark-act)         ;; pick some comfortable binding
+   ("M-:" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+  :init
+
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+
+;; Consult users will also want the embark-consult package.
+(use-package embark-consult
+  :ensure t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package fzf
 :ensure t
@@ -89,18 +156,25 @@
   :ensure t
   :hook (org-mode . org-bullets-mode)
   :config (setq org-agenda-files '("~/org/"))
-          (setq org-agenda-start-with-log-mode t)
-          (setq org-log-done 'time)
-          (setq org-log-into-drawer t)
+	  (setq org-agenda-start-with-log-mode t)
+	  (setq org-log-done 'time)
+	  (setq org-log-into-drawer t)
+	  (setq org-ellipsis " ")
   :bind ("C-c l" . org-store-link)
-        ("C-c a" . org-agenda)
-        ("C-c c" . org-capture))
+	("C-c a" . org-agenda)
+	("C-c c" . org-capture))
 
 (if (daemonp)
     (setq initial-major-mode 'org-mode))
 
 (use-package autothemer
   :ensure t)
+
+(use-package beacon
+  :ensure t
+  :config (beacon-mode 1))
+
+(global-hl-line-mode 1)
 
 (use-package consult
   :ensure t

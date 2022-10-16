@@ -15,6 +15,8 @@ do
 	icon="%{F#6edbff}%{F-}"
     elif [[ $title == *"@arch"* ]]; then
 	icon="%{F#42f569}%{F-}"
+    elif [[ $title == *"Spotify"* ]]; then
+	icon="%{F#1db954}%{F-}"	
     else
 	icon="%{F#ff6e6e}%{F-}"
     fi
