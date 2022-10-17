@@ -21,6 +21,6 @@ do
 	icon="%{F#ff6e6e}%{F-}"
     fi
 
-    echo "${icon} %{F#aaffffff}${title}"
+    echo "${icon} %{F#aaffffff}%{T5}${title}"
 
 done

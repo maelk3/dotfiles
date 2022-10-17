@@ -354,6 +354,23 @@ negligeable.
 	(pdf-tools-install))
 #+end_src
 
+*** Popper
+#+BEGIN_SRC emacs-lisp
+  (use-package popper
+    :ensure t ; or :straight t
+    :bind (("C-S-p"   . popper-toggle-latest)
+	   ("C-S-z"   . popper-cycle)
+	   ("C-M-`" . popper-toggle-type))
+    :init
+    (setq popper-reference-buffers
+	  '("\\*Messages\\*"
+	    "Output\\*$"
+	    "\\*Async Shell Command\\*"
+	    ;; help-mode
+	    compilation-mode))
+    (popper-mode +1)
+    (popper-echo-mode +1))
+#+END_SRC
 *** Vterm
 
 We ensure the vterm package and set the keybinding ~M-T~ to open a new
