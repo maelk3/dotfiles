@@ -156,16 +156,27 @@
   :ensure t
   :hook (org-mode . org-bullets-mode)
   :config (setq org-agenda-files '("~/org/"))
-	  (setq org-agenda-start-with-log-mode t)
-	  (setq org-log-done 'time)
-	  (setq org-log-into-drawer t)
-	  (setq org-ellipsis " ")
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-ellipsis " ")
+  (setq org-src-fontify-natively t)
+  (setq org-highlight-latex-and-related '(latex script entities native))
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   :bind ("C-c l" . org-store-link)
-	("C-c a" . org-agenda)
-	("C-c c" . org-capture))
+  ("C-c a" . org-agenda)
+  ("C-c c" . org-capture))
 
 (if (daemonp)
     (setq initial-major-mode 'org-mode))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (julia . t)))
+
+(use-package htmlize
+  :ensure t)
 
 (use-package autothemer
   :ensure t)
