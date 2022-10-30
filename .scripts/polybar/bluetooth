@@ -1,0 +1,9 @@
+#!/bin/bash
+DEVICE=$(bluetoothctl devices Connected)
+DEVICE_NAME=$(echo $DEVICE | awk '{print $3}')
+if [[ $DEVICE == "" ]]
+then
+    echo "%{F#888888} disconnected"
+else
+    echo "%{F#ffffff} %{F#ffffff}$DEVICE_NAME"
+fi
