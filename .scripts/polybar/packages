@@ -1,0 +1,9 @@
+#!/bin/sh
+
+NB=$(checkupdates | wc -l)
+
+if [ $NB -eq 0 ]; then
+    echo ""
+else
+    echo "%{F#de61fa}  $NB"
+fi
