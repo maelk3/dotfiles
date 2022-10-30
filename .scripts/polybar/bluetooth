@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 DEVICE=$(bluetoothctl devices Connected)
 DEVICE_NAME=$(echo $DEVICE | awk '{print $3}')
 if [[ $DEVICE == "" ]]

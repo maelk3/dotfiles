@@ -1,0 +1,13 @@
+#!/bin/sh
+CONNECTED=$(bluetoothctl devices Connected)
+if [[ $CONNECTED == "" ]]
+then
+    echo "test1"
+    bluetoothctl power on
+    echo "test2"
+    DEVICE=$(bluetoothctl devices | awk '{print $2}')
+    echo $DEVICE
+    bluetoothctl connect $DEVICE
+else
+    bluetoothctl disconnect
+fi
