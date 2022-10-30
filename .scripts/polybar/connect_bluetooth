@@ -5,9 +5,9 @@ then
     echo "test1"
     bluetoothctl power on
     echo "test2"
-    DEVICE=$(bluetoothctl devices | awk '{print $2}')
-    echo $DEVICE
-    bluetoothctl connect $DEVICE
+    DEVICE_CHOSEN=$(bluetoothctl devices | awk '{print $2 " " $3}' | rofi -dmenu | awk '{print $1}')
+    bluetoothctl connect $DEVICE_CHOSEN
 else
     bluetoothctl disconnect
+    bluetoothctl power off
 fi
