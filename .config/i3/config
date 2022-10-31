@@ -210,3 +210,5 @@ client.placeholder      #000000 #0c0c0c #ffffff #000000   #0c0c0c
 client.background       #ffffff
 
 gaps inner 0
+
+for_window [class=Chromium] border pixel 1

@@ -5,5 +5,5 @@ if [[ $DEVICE == "" ]]
 then
     echo "%{F#888888} disconnected"
 else
-    echo "%{F#ffffff} %{F#ffffff}$DEVICE_NAME"
+    echo "%{F#4287f5} %{F#ffffff}$DEVICE_NAME"
 fi

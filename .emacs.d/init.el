@@ -30,7 +30,7 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(fringe-mode 0)
+(fringe-mode 10)
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -41,12 +41,15 @@
 (setq tab-bar-new-button-show nil)
 
 (global-set-key (kbd "M-o") 'other-window)
+(repeat-mode)
 
 (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-18")
-(set-face-attribute 'default nil :font "PragmataPro Mono Liga-18")
+(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
+(set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")
 
-(load-theme 'modus-vivendi)
+;; (load-theme 'ef-duo-dark)
+
+(setq vc-follow-symlinks t)
 
 (use-package magit
   :ensure t)
@@ -66,7 +69,7 @@
 (use-package doom-modeline
   :ensure t
   :config (doom-modeline-mode 1)
-	  (setq doom-modeline-height 35)
+	  (setq doom-modeline-height 45)
 	  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package corfu
@@ -167,8 +170,8 @@
   ("C-c a" . org-agenda)
   ("C-c c" . org-capture))
 
-(if (daemonp)
-    (setq initial-major-mode 'org-mode))
+;; (if (daemonp)
+;;     (setq initial-major-mode 'org-mode))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -177,6 +180,9 @@
 
 (use-package htmlize
   :ensure t)
+
+(setq elfeed-feeds
+      '("https://protesilaos.com/codelog.xml"))
 
 (use-package autothemer
   :ensure t)
@@ -204,20 +210,20 @@
 (if (daemonp)
     (pdf-tools-install))
 
-(use-package popper
-  :ensure t ; or :straight t
-  :bind (("C-S-p"   . popper-toggle-latest)
-	 ("C-S-z"   . popper-cycle)
-	 ("C-M-`" . popper-toggle-type))
-  :init
-  (setq popper-reference-buffers
-	'("\\*Messages\\*"
-	  "Output\\*$"
-	  "\\*Async Shell Command\\*"
-	  ;; help-mode
-	  compilation-mode))
-  (popper-mode +1)
-  (popper-echo-mode +1))
+;; (use-package popper
+;;   :ensure t ; or :straight t
+;;   :bind (("C-S-p"   . popper-toggle-latest)
+;; 	 ("C-S-z"   . popper-cycle)
+;; 	 ("C-M-`" . popper-toggle-type))
+;;   :init
+;;   (setq popper-reference-buffers
+;; 	'("\\*Messages\\*"
+;; 	  "Output\\*$"
+;; 	  "\\*Async Shell Command\\*"
+;; 	  ;; help-mode
+;; 	  compilation-mode))
+;;   (popper-mode +1)
+;;   (popper-echo-mode +1))
 
 (use-package vterm
   :ensure t
