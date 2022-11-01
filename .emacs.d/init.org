@@ -37,7 +37,7 @@ font or customizing a font face.
     (load custom-file)                        ;; load the custom file
 #+end_src
 
-** Basic UI configuration
+** Basic configuration
 
 We disable the *tool bar*, *menu bar* and the *scoll bar*.
 
@@ -91,6 +91,7 @@ We also disable the close button for emacs tabs.
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-o") 'other-window)
   (repeat-mode)
+  (setq delete-by-moving-to-trash t)
 #+end_src
 
 *** Font setup and theme

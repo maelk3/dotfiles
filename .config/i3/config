@@ -194,7 +194,7 @@ exec "~/.config/i3/current_wallpaper"
 bindsym $mod+w sticky toggle
 bindsym $mod+m exec --no-startup-id polybar-msg cmd toggle
 
-exec_always --no-startup-id picom &
+exec_always --no-startup-id picom --experimental-backends &
 
 # polybar
 exec_always --no-startup-id ~/.config/polybar/launch.sh

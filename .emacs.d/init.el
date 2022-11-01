@@ -42,6 +42,7 @@
 
 (global-set-key (kbd "M-o") 'other-window)
 (repeat-mode)
+(setq delete-by-moving-to-trash t)
 
 (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
 (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")

@@ -5,9 +5,9 @@
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-alias ls='ls --color=auto'
-alias ll="exa -lh"
-alias la="exa -ah"
+alias ls='ls --color=auto --group-directories-first'
+alias ll="exa -lh --group-directories-first"
+alias la="exa -ah --group-directories-first"
 alias edit="emacs --no-desktop -nw"
 alias ec="emacsclient -c"
 alias ect="emacsclient -t"
