@@ -48,15 +48,10 @@ We disable the *tool bar*, *menu bar* and the *scoll bar*.
   (customize-set-variable 'horizontal-scroll-bar-mode nil)
 #+end_src
 
- We also enable the mouse support in GUI emacs and set up mouse wheel
-scroll speed.
+ We also enable the mouse support in GUI emacs
 
 #+begin_src emacs-lisp
   (xterm-mouse-mode 1)                     ;; enable mouse
-  (setq mouse-wheel-scroll-amount '(0.07)) ;; change scroll speed
-  (setq mouse-wheel-progressive-speed nil) ;; disable smooth scroll
-  (setq ring-bell-function 'ignore)        ;; disable bell sound
-  (setq scroll-step 1)                     ;; smooth scrolling
 #+end_src
 
 We setup a better window vertical split symbol in terminal emacs to
@@ -92,14 +87,23 @@ We also disable the close button for emacs tabs.
   (global-set-key (kbd "M-o") 'other-window)
   (repeat-mode)
   (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches "-al --group-directories-first")
+  (setq scroll-conservatively 101)
+  (setq scroll-margin 4)
+  (setq gc-cons-threshold 100000000)  
 #+end_src
 
 *** Font setup and theme
 
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")
+  (defun my-font-config (frame) (progn
+			     (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
+			     (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
+			     (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions #'my-font-config)
+    (my-font-config))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -227,15 +231,6 @@ The doom modeline provides a more aesthetic modeline with git status.
     (embark-collect-mode . consult-preview-at-point-mode))
 #+END_SRC
 
-*** FZF
-
-#+begin_src emacs-lisp
-    (use-package fzf
-    :ensure t
-    :bind (("C-x f" . fzf-find-file)
-           ("C-x c" . cd)))
-#+end_src
-
 *** Vertico
 
 Vertico mode allows a better mini buffer with a comprehensive lisp of
@@ -297,7 +292,7 @@ provides fuzzy finding.
     (setq org-log-into-drawer t)
     (setq org-ellipsis " ")
     (setq org-src-fontify-natively t)
-    (setq org-highlight-latex-and-related '(latex script entities native))
+    (setq org-highlight-latex-and-related '(latex script entities))
     (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
     :bind ("C-c l" . org-store-link)
     ("C-c a" . org-agenda)
@@ -382,6 +377,7 @@ negligeable.
 #+end_src
 
 *** Popper
+
 #+BEGIN_SRC emacs-lisp
   ;; (use-package popper
   ;;   :ensure t ; or :straight t
@@ -398,6 +394,7 @@ negligeable.
   ;;   (popper-mode +1)
   ;;   (popper-echo-mode +1))
 #+END_SRC
+
 *** Vterm
 
 We ensure the vterm package and set the keybinding ~M-T~ to open a new

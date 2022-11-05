@@ -18,10 +18,6 @@
 (customize-set-variable 'horizontal-scroll-bar-mode nil)
 
 (xterm-mouse-mode 1)                     ;; enable mouse
-(setq mouse-wheel-scroll-amount '(0.07)) ;; change scroll speed
-(setq mouse-wheel-progressive-speed nil) ;; disable smooth scroll
-(setq ring-bell-function 'ignore)        ;; disable bell sound
-(setq scroll-step 1)                     ;; smooth scrolling
 
 (set-face-inverse-video-p 'vertical-border nil)
 (set-face-background 'vertical-border (face-background 'default))
@@ -43,10 +39,19 @@
 (global-set-key (kbd "M-o") 'other-window)
 (repeat-mode)
 (setq delete-by-moving-to-trash t)
+(setq dired-listing-switches "-al --group-directories-first")
+(setq scroll-conservatively 101)
+(setq scroll-margin 4)
+(setq gc-cons-threshold 100000000)
 
-(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-(set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")
+(defun my-font-config (frame) (progn
+			   (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
+			   (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
+			   (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+
+(if (daemonp)
+    (add-hook 'after-make-frame-functions #'my-font-config)
+  (my-font-config))
 
 ;; (load-theme 'ef-duo-dark)
 
@@ -131,11 +136,6 @@
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package fzf
-:ensure t
-:bind (("C-x f" . fzf-find-file)
-       ("C-x c" . cd)))
-
 (use-package vertico
   :config (vertico-mode)
           (setq vertico-cycle t))
@@ -165,7 +165,7 @@
   (setq org-log-into-drawer t)
   (setq org-ellipsis " ")
   (setq org-src-fontify-natively t)
-  (setq org-highlight-latex-and-related '(latex script entities native))
+  (setq org-highlight-latex-and-related '(latex script entities))
   (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
   :bind ("C-c l" . org-store-link)
   ("C-c a" . org-agenda)
