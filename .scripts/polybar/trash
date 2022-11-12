@@ -1,0 +1,5 @@
+#!/bin/bash
+
+TRASH_SIZE=$(du -sh ~/.local/share/Trash/files | awk '{print $1}')
+
+echo "%{T4}%{F#ffee00}%{T-} %{F#ffffff}$TRASH_SIZE"

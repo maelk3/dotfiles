@@ -43,17 +43,24 @@
 (setq scroll-conservatively 101)
 (setq scroll-margin 4)
 (setq gc-cons-threshold 100000000)
+(winner-mode)
 
 (defun my-font-config (frame) (progn
-			   (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-			   (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-			   (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
+				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
+				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
-  (my-font-config))
+  (my-font-config nil))
 
 ;; (load-theme 'ef-duo-dark)
+
+(use-package irony
+  :ensure t
+  :config
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode))
 
 (setq vc-follow-symlinks t)
 
@@ -283,3 +290,9 @@
 (use-package xclip
   :ensure t
   :config (xclip-mode t))
+
+(use-package gnugo
+  :ensure t
+  :config
+  (setq gnugo-xpms 'gnugo-imgen-create-xpms)
+  (setq gnugo-imgen-style 'ttn))

@@ -4,21 +4,18 @@ while true
 do
     i3-msg -t subscribe '[ "window" ]' >> /dev/null
     title=$(xdotool getwindowfocus getwindowname)
+    window_class=$(xdotool getactivewindow getwindowclassname)
 
-    if [[ $title == "i3" ]]; then
-	icon=""
-    elif [[ $title == *"Firefox"* ]]; then
+    if [[ $window_class == "firefox" ]]; then
 	icon="%{F#e66000}%{T4}%{T-}%{F-}"
-    elif [[ $title == *"Emacs"* ]]; then
+    elif [[ $window_class == "Emacs" ]]; then
 	icon="%{F#ca6eff}%{T4}%{T-}%{F-}"
-    elif [[ $title == *"pdf"* ]]; then
+    elif [[ $window_class == "Zathura" ]]; then
 	icon="%{F#6edbff}%{F-}"
-    elif [[ $title == *"@arch"* ]]; then
-	icon="%{F#42f569}%{F-}"
-    elif [[ $title == *"Spotify"* ]]; then
-	icon="%{F#1db954}%{F-}"	
+    elif [[ $window_class == "Alacritty" ]]; then
+	icon="%{F#42f569}%{F-}"	
     else
-	icon="%{F#ff6e6e}%{F-}"
+	icon="%{F#ff6e6e}%{F-}"
     fi
 
     echo "${icon} %{F#aaffffff}%{T5}${title}"

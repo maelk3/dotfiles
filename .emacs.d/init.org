@@ -90,27 +90,38 @@ We also disable the close button for emacs tabs.
   (setq dired-listing-switches "-al --group-directories-first")
   (setq scroll-conservatively 101)
   (setq scroll-margin 4)
-  (setq gc-cons-threshold 100000000)  
+  (setq gc-cons-threshold 100000000)
+  (winner-mode)
 #+end_src
 
 *** Font setup and theme
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defun my-font-config (frame) (progn
-			     (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-			     (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-			     (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
+				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
+				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'my-font-config)
-    (my-font-config))
-#+END_SRC
+    (my-font-config nil))
+#+end_src
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   ;; (load-theme 'ef-duo-dark)
-#+END_SRC
+#+end_src
 
 * Package specific configuration
+** C++
+
+#+begin_src emacs-lisp
+  (use-package irony
+    :ensure t
+    :config
+    (add-hook 'c++-mode-hook 'irony-mode)
+    (add-hook 'c-mode-hook 'irony-mode))
+#+end_src
+
 ** Git
 
 #+begin_src emacs-lisp
@@ -167,7 +178,7 @@ The doom modeline provides a more aesthetic modeline with git status.
 ** Minibuffer
 *** Corfu
 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (use-package corfu
     :ensure t
     ;; Optional customizations
@@ -201,7 +212,7 @@ The doom modeline provides a more aesthetic modeline with git status.
     (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
     :config
     (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-#+END_SRC
+#+end_src
 
 *** Embark
 
@@ -485,3 +496,12 @@ We use ~xclip-mode~ to be able to copy/paste in and out of emacs.
     :config (xclip-mode t))
   #+end_src
   
+*** Gnugo
+
+#+begin_src emacs-lisp
+      (use-package gnugo
+	:ensure t
+	:config
+	(setq gnugo-xpms 'gnugo-imgen-create-xpms)
+	(setq gnugo-imgen-style 'ttn))
+#+end_src
