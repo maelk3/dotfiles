@@ -99,6 +99,9 @@
   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+  :bind
+  ;; Configure SPC for separator insertion
+  (:map corfu-map ("SPC" . corfu-insert-separator))    
 
   ;; Enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
@@ -110,14 +113,20 @@
   ;; See also `corfu-excluded-modes'.
   :init
   (global-corfu-mode))
-
-(use-package kind-icon
+;; (use-package kind-icon
+;;   :ensure t
+;;   :after corfu
+;;   :custom
+;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+(use-package corfu-doc
   :ensure t
-  :after corfu
-  :custom
-  (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  :init
+  (add-hook 'corfu-mode-hook #'corfu-doc-mode)
+  (define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down)
+  (define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)
+  (define-key corfu-map (kbd "M-d") #'corfu-doc-toggle))
 
 (use-package embark
   :ensure t
@@ -200,6 +209,28 @@
   :config (beacon-mode 1))
 
 (global-hl-line-mode 1)
+
+(use-package cape
+  :ensure t
+  ;; Bind dedicated completion commands
+  ;; Alternative prefix keys: C-c p, M-p, M-+, ...
+  :bind (
+	 ("M-/" . cape-dabbrev))
+  :init
+  ;; Add `completion-at-point-functions', used by `completion-at-point'.
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  ;;(add-to-list 'completion-at-point-functions #'cape-history)
+  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  )
 
 (use-package consult
   :ensure t
