@@ -98,9 +98,9 @@ We also disable the close button for emacs tabs.
 
 #+begin_src emacs-lisp
   (defun my-font-config (frame) (progn
-				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-17")
+				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-17")
+				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-17")))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'my-font-config)
@@ -115,11 +115,11 @@ We also disable the close button for emacs tabs.
 ** C++
 
 #+begin_src emacs-lisp
-  (use-package irony
-    :ensure t
-    :config
-    (add-hook 'c++-mode-hook 'irony-mode)
-    (add-hook 'c-mode-hook 'irony-mode))
+  ;; (use-package irony
+  ;;   :ensure t
+  ;;   :config
+  ;;   (add-hook 'c++-mode-hook 'irony-mode)
+  ;;   (add-hook 'c-mode-hook 'irony-mode))
 #+end_src
 
 ** Git
@@ -335,8 +335,8 @@ provides fuzzy finding.
 ** Elfeed
 
 #+begin_src emacs-lisp
-(setq elfeed-feeds
-      '("https://protesilaos.com/codelog.xml"))
+  ;; (setq elfeed-feeds
+  ;;       '("https://protesilaos.com/codelog.xml"))
 #+end_src
 
 ** Miscellaneous
@@ -356,7 +356,6 @@ provides fuzzy finding.
 
   (global-hl-line-mode 1)
 #+END_SRC
-
 
 *** Cape
 
@@ -402,6 +401,17 @@ are either used via the minibuffer are bound to keybindings.
 	     ("M-y" . consult-yank-pop)
 	     ("M-s" . consult-line)
 	     ("C-c o" . consult-file-externally))
+#+end_src
+
+*** Eglot
+
+#+begin_src emacs-lisp
+  (use-package eglot
+    :ensure t
+  :config
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure))
 #+end_src
 
 *** Pdf-tools

@@ -46,9 +46,9 @@
 (winner-mode)
 
 (defun my-font-config (frame) (progn
-				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-20")
-				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-19")
-				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-19")))
+				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-17")
+				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-17")
+				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-17")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
@@ -56,11 +56,11 @@
 
 ;; (load-theme 'ef-duo-dark)
 
-(use-package irony
-  :ensure t
-  :config
-  (add-hook 'c++-mode-hook 'irony-mode)
-  (add-hook 'c-mode-hook 'irony-mode))
+;; (use-package irony
+;;   :ensure t
+;;   :config
+;;   (add-hook 'c++-mode-hook 'irony-mode)
+;;   (add-hook 'c-mode-hook 'irony-mode))
 
 (setq vc-follow-symlinks t)
 
@@ -198,8 +198,8 @@
 (use-package htmlize
   :ensure t)
 
-(setq elfeed-feeds
-      '("https://protesilaos.com/codelog.xml"))
+;; (setq elfeed-feeds
+;;       '("https://protesilaos.com/codelog.xml"))
 
 (use-package autothemer
   :ensure t)
@@ -241,6 +241,13 @@
 	 ("M-y" . consult-yank-pop)
 	 ("M-s" . consult-line)
 	 ("C-c o" . consult-file-externally))
+
+(use-package eglot
+  :ensure t
+:config
+(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure))
 
 (use-package pdf-tools
   :ensure t
