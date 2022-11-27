@@ -201,14 +201,13 @@
 ;; (setq elfeed-feeds
 ;;       '("https://protesilaos.com/codelog.xml"))
 
+(use-package affe
+  :config
+  ;; Manual preview key for `affe-grep'
+  (consult-customize affe-grep :preview-key (kbd "M-.")))
+
 (use-package autothemer
   :ensure t)
-
-(use-package beacon
-  :ensure t
-  :config (beacon-mode 1))
-
-(global-hl-line-mode 1)
 
 (use-package cape
   :ensure t
@@ -242,12 +241,16 @@
 	 ("M-s" . consult-line)
 	 ("C-c o" . consult-file-externally))
 
+(use-package eglot-jl
+  :ensure t)
+
 (use-package eglot
   :ensure t
-:config
-(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-(add-hook 'c-mode-hook 'eglot-ensure)
-(add-hook 'c++-mode-hook 'eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure)
+  (setq eglot-connect-timeout 10000))
 
 (use-package pdf-tools
   :ensure t
