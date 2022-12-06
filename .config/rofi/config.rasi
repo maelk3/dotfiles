@@ -1,0 +1,13 @@
+configuration {               
+/*  modi: "window,run,ssh,drun";*/
+  font: "iosevka 12";
+/*  location: 0;*/
+/*  yoffset: 0;*/
+/*  xoffset: 0;*/
+/*  fixed-num-lines: true;*/
+/*  ml-row-down: "ScrollDown";*/                                                                                        
+/*  me-select-entry: "MousePrimary";*/                                                                                  
+/*  me-accept-entry: "MouseDPrimary";*/                                                                                 
+/*  me-accept-custom: "Control+MouseDPrimary";*/ 
+}
+@theme "/usr/share/rofi/themes/Arc-Dark.rasi"
