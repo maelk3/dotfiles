@@ -72,7 +72,7 @@ We also disable the close button for emacs tabs.
   (setq tex-fontify-script nil)
   (setq font-latex-fontify-script nil)
 
-  (fringe-mode 10)
+  (fringe-mode 0)
 
   (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -81,6 +81,7 @@ We also disable the close button for emacs tabs.
 
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-new-button-show nil)
+  (global-hl-line-mode t)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -98,9 +99,9 @@ We also disable the close button for emacs tabs.
 
 #+begin_src emacs-lisp
   (defun my-font-config (frame) (progn
-				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-17")
-				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-17")
-				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-17")))
+				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
+				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-12")
+				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-12")))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'my-font-config)
@@ -171,7 +172,7 @@ The doom modeline provides a more aesthetic modeline with git status.
     (use-package doom-modeline
       :ensure t
       :config (doom-modeline-mode 1)
-	      (setq doom-modeline-height 45)
+	      (setq doom-modeline-height 35)
 	      (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 #+end_src
 
@@ -179,41 +180,44 @@ The doom modeline provides a more aesthetic modeline with git status.
 *** Corfu
 
 #+begin_src emacs-lisp
-  (use-package corfu
-    :ensure t
-    ;; Optional customizations
-    :custom
-    ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-    (corfu-auto t)                 ;; Enable auto completion
-    ;; (corfu-separator ?\s)          ;; Orderless field separator
-    ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-    ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-    ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-    ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-    ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-    ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-    ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-    :bind
-    ;; Configure SPC for separator insertion
-    (:map corfu-map ("SPC" . corfu-insert-separator))    
+      (use-package corfu
+	:ensure t
+	;; Optional customizations
+	:custom
+	;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+	(corfu-auto t)                 ;; Enable auto completion
+	;; (corfu-separator ?\s)          ;; Orderless field separator
+	;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+	;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+	;; (corfu-preview-current nil)    ;; Disable current candidate preview
+	;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+	;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+	;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+	;; (corfu-scroll-margin 5)        ;; Use scroll margin
+	:bind
+	;; Configure SPC for separator insertion
+	(:map corfu-map ("SPC" . corfu-insert-separator)
+	      ("M-p" . corfu-doc-scroll-down)
+	      ("M-n" . corfu-doc-scroll-up)
+	      ("M-d" . corfu-doc-toggle))
+	;; Enable Corfu only for certain modes.
+	;; :hook ((prog-mode . corfu-mode)
+	;;        (shell-mode . corfu-mode)
+	;;        (eshell-mode . corfu-mode))
 
-    ;; Enable Corfu only for certain modes.
-    ;; :hook ((prog-mode . corfu-mode)
-    ;;        (shell-mode . corfu-mode)
-    ;;        (eshell-mode . corfu-mode))
-
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since Dabbrev can be used globally (M-/).
-    ;; See also `corfu-excluded-modes'.
-    :init
-    (global-corfu-mode))
-  ;; (use-package kind-icon
-  ;;   :ensure t
-  ;;   :after corfu
-  ;;   :custom
-  ;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
-  ;;   :config
-  ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+	;; Recommended: Enable Corfu globally.
+	;; This is recommended since Dabbrev can be used globally (M-/).
+	;; See also `corfu-excluded-modes'.
+	:init
+	(global-corfu-mode)
+	(corfu-doc-mode))
+      ;; (use-package kind-icon
+      ;;   :ensure t
+      ;;   :after corfu
+      ;;   :custom
+      ;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+      ;;   :config
+      ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 #+end_src
 
 *** Embark

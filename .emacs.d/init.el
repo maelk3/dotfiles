@@ -26,7 +26,7 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(fringe-mode 10)
+(fringe-mode 0)
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -35,6 +35,7 @@
 
 (setq tab-bar-close-button-show nil)
 (setq tab-bar-new-button-show nil)
+(global-hl-line-mode t)
 
 (global-set-key (kbd "M-o") 'other-window)
 (repeat-mode)
@@ -46,9 +47,9 @@
 (winner-mode)
 
 (defun my-font-config (frame) (progn
-				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-17")
-				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-17")
-				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-17")))
+				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
+				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-12")
+				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-12")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
@@ -82,7 +83,7 @@
 (use-package doom-modeline
   :ensure t
   :config (doom-modeline-mode 1)
-	  (setq doom-modeline-height 45)
+	  (setq doom-modeline-height 35)
 	  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package corfu
@@ -101,8 +102,10 @@
   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
   :bind
   ;; Configure SPC for separator insertion
-  (:map corfu-map ("SPC" . corfu-insert-separator))    
-
+  (:map corfu-map ("SPC" . corfu-insert-separator)
+	("M-p" . corfu-doc-scroll-down)
+	("M-n" . corfu-doc-scroll-up)
+	("M-d" . corfu-doc-toggle))
   ;; Enable Corfu only for certain modes.
   ;; :hook ((prog-mode . corfu-mode)
   ;;        (shell-mode . corfu-mode)
@@ -112,7 +115,8 @@
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (corfu-doc-mode))
 ;; (use-package kind-icon
 ;;   :ensure t
 ;;   :after corfu
@@ -120,13 +124,6 @@
 ;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
 ;;   :config
 ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
-(use-package corfu-doc
-  :ensure t
-  :init
-  (add-hook 'corfu-mode-hook #'corfu-doc-mode)
-  (define-key corfu-map (kbd "M-p") #'corfu-doc-scroll-down)
-  (define-key corfu-map (kbd "M-n") #'corfu-doc-scroll-up)
-  (define-key corfu-map (kbd "M-d") #'corfu-doc-toggle))
 
 (use-package embark
   :ensure t
