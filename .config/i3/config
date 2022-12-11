@@ -213,3 +213,4 @@ gaps inner 0
 
 for_window [class=Chromium] border pixel 1
 default_floating_border pixel 1
+hide_edge_borders smart
