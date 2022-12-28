@@ -1,6 +1,8 @@
 #+title: Emacs configuration file
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
+* TODO make eglot hook async to prevent emacs from freezing
+
 * Base configuration
 
 ** Package system setup
@@ -86,13 +88,15 @@ We also disable the close button for emacs tabs.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-o") 'other-window)
-  (repeat-mode)
+  ;; (repeat-mode)
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches "-al --group-directories-first")
   (setq scroll-conservatively 101)
   (setq scroll-margin 4)
   (setq gc-cons-threshold 100000000)
   (winner-mode)
+  (setq window-min-width 100)
+  (setq window-min-height 20)
 #+end_src
 
 *** Font setup and theme
@@ -106,6 +110,9 @@ We also disable the close button for emacs tabs.
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'my-font-config)
     (my-font-config nil))
+
+  ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  ;; (setq highlight-indent-guides-method 'character)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -169,11 +176,11 @@ Support for icons used in the doom modeline.
 The doom modeline provides a more aesthetic modeline with git status.
 
 #+begin_src emacs-lisp
-    (use-package doom-modeline
-      :ensure t
-      :config (doom-modeline-mode 1)
-	      (setq doom-modeline-height 35)
-	      (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+  ;; (use-package doom-modeline
+  ;;   :ensure t
+  ;;   :config (doom-modeline-mode 1)
+  ;;   (setq doom-modeline-height 30)
+  ;;   (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 #+end_src
 
 ** Minibuffer
@@ -336,6 +343,29 @@ provides fuzzy finding.
   ;;       '("https://protesilaos.com/codelog.xml"))
 #+end_src
 
+** Theme
+
+The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ packages with some modifications, mainly a more subtle status bar.
+
+#+begin_src emacs-lisp
+  (use-package doom-themes
+    :ensure t)
+
+  (custom-set-variables
+   '(custom-enabled-themes '(doom-ir-black)))
+
+   (custom-theme-set-faces
+    'doom-ir-black
+    '(doom-modeline-bar-inactive ((t (:background "grey6"))))
+    '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+    '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+    '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+    '(org-block ((t (:extend t :background "grey6")))))
+
+   (custom-set-variables
+    '(custom-enabled-themes '(doom-ir-black)))
+#+end_src
+
 ** Miscellaneous
 *** Affe
 
@@ -399,19 +429,35 @@ are either used via the minibuffer are bound to keybindings.
 	     ("C-c o" . consult-file-externally))
 #+end_src
 
+*** Diff-hl
+
+#+begin_src emacs-lisp
+  (use-package diff-hl
+    :ensure t
+    :hook ('prog-mode . 'diff-hl-margin-mode)
+	  ('plain-TeX-mode-hook . 'diff-hl-margin-mode)
+	  (org-mode . 'diff-hl-margin-mode))
+#+end_src
+
 *** Eglot
 
 #+begin_src emacs-lisp
-  (use-package eglot-jl
-    :ensure t)
+      (use-package eglot-jl
+	:ensure t)
 
-  (use-package eglot
-    :ensure t
-    :config
-    (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-    (add-hook 'c-mode-hook 'eglot-ensure)
-    (add-hook 'c++-mode-hook 'eglot-ensure)
-    (setq eglot-connect-timeout 10000))
+      (defun my-julia-init ()
+	(progn
+	  (eglot-jl-init)
+	  (eglot-ensure)))
+
+      (use-package eglot
+	:ensure t
+	:config
+	(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+	(add-hook 'c-mode-hook 'eglot-ensure)
+	(add-hook 'c++-mode-hook 'eglot-ensure)
+	(add-hook 'julia-mode-hook 'my-julia-init)
+	(setq eglot-connect-timeout 10000))
 #+end_src
 
 *** Pdf-tools
@@ -425,33 +471,49 @@ daemon mode or before opening a pdf document) and the load time is non
 negligeable.
 
 #+begin_src emacs-lisp
-    (use-package pdf-tools
-      :ensure t
-      :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode))
+      (use-package pdf-tools
+	:ensure t
+	:hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
+	:config (setq pdf-view-midnight-colors '("white" . "black")))
 
-    (if (daemonp)
-	(pdf-tools-install))
+      (if (daemonp)
+	  (pdf-tools-install))
 #+end_src
 
 *** Popper
 
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package popper
-  ;;   :ensure t ; or :straight t
-  ;;   :bind (("C-S-p"   . popper-toggle-latest)
-  ;; 	 ("C-S-z"   . popper-cycle)
-  ;; 	 ("C-M-`" . popper-toggle-type))
-  ;;   :init
-  ;;   (setq popper-reference-buffers
-  ;; 	'("\\*Messages\\*"
-  ;; 	  "Output\\*$"
-  ;; 	  "\\*Async Shell Command\\*"
-  ;; 	  ;; help-mode
-  ;; 	  compilation-mode))
-  ;;   (popper-mode +1)
-  ;;   (popper-echo-mode +1))
+  (use-package popper
+    :ensure t ; or :straight t
+    :bind (("C-S-p"   . popper-toggle-latest)
+	   ("C-S-z"   . popper-cycle)
+	   ("C-M-`" . popper-toggle-type))
+    :init
+    (setq popper-reference-buffers
+	  '("\\*Messages\\*"
+	    "Output\\*$"
+	    "\\*Async Shell Command\\*"
+	    ;; help-mode
+	    compilation-mode))
+    (popper-mode +1)
+    (popper-echo-mode +1))
 #+END_SRC
 
+*** Pulsar
+#+begin_src  emacs-lisp
+  (use-package pulsar
+    :ensure t
+    :init (pulsar-global-mode 1)
+    :custom (pulsar-pulse-functions '(other-window
+				      windmove-do-window-select
+				      mouse-set-point
+				      mouse-select-window
+				      scroll-up-command
+				      scroll-down-command
+				      recenter-top-bottom
+				      isearch-repeat-forward
+				      isearch-repeat-backward)))
+#+end_src				      
 *** Vterm
 
 We ensure the vterm package and set the keybinding ~M-T~ to open a new

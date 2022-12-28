@@ -38,13 +38,15 @@
 (global-hl-line-mode t)
 
 (global-set-key (kbd "M-o") 'other-window)
-(repeat-mode)
+;; (repeat-mode)
 (setq delete-by-moving-to-trash t)
 (setq dired-listing-switches "-al --group-directories-first")
 (setq scroll-conservatively 101)
 (setq scroll-margin 4)
 (setq gc-cons-threshold 100000000)
 (winner-mode)
+(setq window-min-width 100)
+(setq window-min-height 20)
 
 (defun my-font-config (frame) (progn
 				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
@@ -54,6 +56,9 @@
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
   (my-font-config nil))
+
+;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+;; (setq highlight-indent-guides-method 'character)
 
 ;; (load-theme 'ef-duo-dark)
 
@@ -80,11 +85,11 @@
   :config (setq all-the-icons-scale-factor 1.0)
           (setq all-the-icons-fileicon-scale-factor 1.0))
 
-(use-package doom-modeline
-  :ensure t
-  :config (doom-modeline-mode 1)
-	  (setq doom-modeline-height 35)
-	  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+;; (use-package doom-modeline
+;;   :ensure t
+;;   :config (doom-modeline-mode 1)
+;;   (setq doom-modeline-height 30)
+;;   (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package corfu
   :ensure t
@@ -198,6 +203,23 @@
 ;; (setq elfeed-feeds
 ;;       '("https://protesilaos.com/codelog.xml"))
 
+(use-package doom-themes
+  :ensure t)
+
+(custom-set-variables
+ '(custom-enabled-themes '(doom-ir-black)))
+
+ (custom-theme-set-faces
+  'doom-ir-black
+  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
+  '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+  '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+  '(org-block ((t (:extend t :background "grey6")))))
+
+ (custom-set-variables
+  '(custom-enabled-themes '(doom-ir-black)))
+
 (use-package affe
   :config
   ;; Manual preview key for `affe-grep'
@@ -238,8 +260,19 @@
 	 ("M-s" . consult-line)
 	 ("C-c o" . consult-file-externally))
 
+(use-package diff-hl
+  :ensure t
+  :hook ('prog-mode . 'diff-hl-margin-mode)
+	('plain-TeX-mode-hook . 'diff-hl-margin-mode)
+	(org-mode . 'diff-hl-margin-mode))
+
 (use-package eglot-jl
   :ensure t)
+
+(defun my-julia-init ()
+  (progn
+    (eglot-jl-init)
+    (eglot-ensure)))
 
 (use-package eglot
   :ensure t
@@ -247,29 +280,44 @@
   (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
+  (add-hook 'julia-mode-hook 'my-julia-init)
   (setq eglot-connect-timeout 10000))
 
 (use-package pdf-tools
   :ensure t
-  :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode))
+  :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
+  :config (setq pdf-view-midnight-colors '("white" . "black")))
 
 (if (daemonp)
     (pdf-tools-install))
 
-;; (use-package popper
-;;   :ensure t ; or :straight t
-;;   :bind (("C-S-p"   . popper-toggle-latest)
-;; 	 ("C-S-z"   . popper-cycle)
-;; 	 ("C-M-`" . popper-toggle-type))
-;;   :init
-;;   (setq popper-reference-buffers
-;; 	'("\\*Messages\\*"
-;; 	  "Output\\*$"
-;; 	  "\\*Async Shell Command\\*"
-;; 	  ;; help-mode
-;; 	  compilation-mode))
-;;   (popper-mode +1)
-;;   (popper-echo-mode +1))
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("C-S-p"   . popper-toggle-latest)
+	 ("C-S-z"   . popper-cycle)
+	 ("C-M-`" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+	'("\\*Messages\\*"
+	  "Output\\*$"
+	  "\\*Async Shell Command\\*"
+	  ;; help-mode
+	  compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+(use-package pulsar
+  :ensure t
+  :init (pulsar-global-mode 1)
+  :custom (pulsar-pulse-functions '(other-window
+				    windmove-do-window-select
+				    mouse-set-point
+				    mouse-select-window
+				    scroll-up-command
+				    scroll-down-command
+				    recenter-top-bottom
+				    isearch-repeat-forward
+				    isearch-repeat-backward)))
 
 (use-package vterm
   :ensure t
