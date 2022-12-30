@@ -60,8 +60,6 @@
 ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 ;; (setq highlight-indent-guides-method 'character)
 
-;; (load-theme 'ef-duo-dark)
-
 ;; (use-package irony
 ;;   :ensure t
 ;;   :config
@@ -84,6 +82,18 @@
 (use-package all-the-icons
   :config (setq all-the-icons-scale-factor 1.0)
           (setq all-the-icons-fileicon-scale-factor 1.0))
+
+(use-package all-the-icons-ibuffer
+  :ensure t
+  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :init (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
+(use-package all-the-icons-completion
+  :ensure t
+  :init (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 
 ;; (use-package doom-modeline
 ;;   :ensure t
@@ -200,8 +210,9 @@
 (use-package htmlize
   :ensure t)
 
-;; (setq elfeed-feeds
-;;       '("https://protesilaos.com/codelog.xml"))
+(use-package elfeed
+  :ensure t
+  :init (setq elfeed-show-entry-switch 'display-buffer))
 
 (use-package doom-themes
   :ensure t)
@@ -285,7 +296,7 @@
 
 (use-package pdf-tools
   :ensure t
-  :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
+  ;; :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
   :config (setq pdf-view-midnight-colors '("white" . "black")))
 
 (if (daemonp)
@@ -301,8 +312,12 @@
 	'("\\*Messages\\*"
 	  "Output\\*$"
 	  "\\*Async Shell Command\\*"
-	  ;; help-mode
-	  compilation-mode))
+	  "\\*elfeed-search\\*"
+	  "\\*julia\\*"
+	  eshell-mode
+	  help-mode
+	  compilation-mode
+	  pdf-outline-buffer-mode))
   (popper-mode +1)
   (popper-echo-mode +1))
 
@@ -317,7 +332,9 @@
 				    scroll-down-command
 				    recenter-top-bottom
 				    isearch-repeat-forward
-				    isearch-repeat-backward)))
+				    isearch-repeat-backward
+				    beginning-of-buffer
+				    end-of-buffer)))
 
 (use-package vterm
   :ensure t

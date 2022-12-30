@@ -115,10 +115,6 @@ We also disable the close button for emacs tabs.
   ;; (setq highlight-indent-guides-method 'character)
 #+end_src
 
-#+begin_src emacs-lisp
-  ;; (load-theme 'ef-duo-dark)
-#+end_src
-
 * Package specific configuration
 ** C++
 
@@ -169,6 +165,20 @@ Support for icons used in the doom modeline.
   (use-package all-the-icons
     :config (setq all-the-icons-scale-factor 1.0)
             (setq all-the-icons-fileicon-scale-factor 1.0))
+#+end_src
+
+#+begin_src emacs-lisp
+      (use-package all-the-icons-ibuffer
+	:ensure t
+	:hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+
+      (use-package all-the-icons-dired
+	:ensure t
+	:init (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+
+      (use-package all-the-icons-completion
+	:ensure t
+	:init (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 #+end_src
 
 *** Doom modeline
@@ -339,8 +349,9 @@ provides fuzzy finding.
 ** Elfeed
 
 #+begin_src emacs-lisp
-  ;; (setq elfeed-feeds
-  ;;       '("https://protesilaos.com/codelog.xml"))
+  (use-package elfeed
+    :ensure t
+    :init (setq elfeed-show-entry-switch 'display-buffer))
 #+end_src
 
 ** Theme
@@ -471,13 +482,13 @@ daemon mode or before opening a pdf document) and the load time is non
 negligeable.
 
 #+begin_src emacs-lisp
-      (use-package pdf-tools
-	:ensure t
-	:hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
-	:config (setq pdf-view-midnight-colors '("white" . "black")))
+  (use-package pdf-tools
+    :ensure t
+    ;; :hook (pdf-tools-enabled . pdf-view-midnight-minor-mode)
+    :config (setq pdf-view-midnight-colors '("white" . "black")))
 
-      (if (daemonp)
-	  (pdf-tools-install))
+  (if (daemonp)
+      (pdf-tools-install))
 #+end_src
 
 *** Popper
@@ -493,26 +504,32 @@ negligeable.
 	  '("\\*Messages\\*"
 	    "Output\\*$"
 	    "\\*Async Shell Command\\*"
-	    ;; help-mode
-	    compilation-mode))
+	    "\\*elfeed-search\\*"
+	    "\\*julia\\*"
+	    eshell-mode
+	    help-mode
+	    compilation-mode
+	    pdf-outline-buffer-mode))
     (popper-mode +1)
     (popper-echo-mode +1))
 #+END_SRC
 
 *** Pulsar
 #+begin_src  emacs-lisp
-  (use-package pulsar
-    :ensure t
-    :init (pulsar-global-mode 1)
-    :custom (pulsar-pulse-functions '(other-window
-				      windmove-do-window-select
-				      mouse-set-point
-				      mouse-select-window
-				      scroll-up-command
-				      scroll-down-command
-				      recenter-top-bottom
-				      isearch-repeat-forward
-				      isearch-repeat-backward)))
+      (use-package pulsar
+	:ensure t
+	:init (pulsar-global-mode 1)
+	:custom (pulsar-pulse-functions '(other-window
+					  windmove-do-window-select
+					  mouse-set-point
+					  mouse-select-window
+					  scroll-up-command
+					  scroll-down-command
+					  recenter-top-bottom
+					  isearch-repeat-forward
+					  isearch-repeat-backward
+					  beginning-of-buffer
+					  end-of-buffer)))
 #+end_src				      
 *** Vterm
 
