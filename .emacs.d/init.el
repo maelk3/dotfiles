@@ -26,7 +26,7 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(fringe-mode 0)
+(set-fringe-mode '(1 . 1))
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -38,15 +38,16 @@
 (global-hl-line-mode t)
 
 (global-set-key (kbd "M-o") 'other-window)
-;; (repeat-mode)
+(repeat-mode)
 (setq delete-by-moving-to-trash t)
 (setq dired-listing-switches "-al --group-directories-first")
 (setq scroll-conservatively 101)
 (setq scroll-margin 4)
 (setq gc-cons-threshold 100000000)
 (winner-mode)
-(setq window-min-width 100)
-(setq window-min-height 20)
+(setq window-min-width 50)
+(setq window-min-height 10)
+(defalias 'yes-or-no-p 'y-or-n-p)
 
 (defun my-font-config (frame) (progn
 				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
@@ -215,21 +216,30 @@
   :init (setq elfeed-show-entry-switch 'display-buffer))
 
 (use-package doom-themes
-  :ensure t)
+   :ensure t)
 
-(custom-set-variables
- '(custom-enabled-themes '(doom-ir-black)))
+;; (setq custom--inhibit-theme-enable nil)
+(load-theme 'doom-ir-black)
 
- (custom-theme-set-faces
-  'doom-ir-black
-  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
-  '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
-  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
-  '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
-  '(org-block ((t (:extend t :background "grey6")))))
+  (custom-theme-set-faces
+   'doom-ir-black
+   '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+   '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+   '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+   '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+   '(org-block ((t (:extend t :background "grey5"))))
+   '(diff-removed ((t (:background "#121212"))))
+   '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
+   '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
+   '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
+   '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+   '(dired-directory ((t (:foreground "coral" :weight bold))))
+   '(font-lock-builtin-face ((t (:foreground "wheat2"))))
+   '(outline-2 ((t (:foreground "coral"))))
+   '(outline-3 ((t (:foreground "#99CC99"))))
+   '(outline-4 ((t (:foreground "wheat2")))))
 
- (custom-set-variables
-  '(custom-enabled-themes '(doom-ir-black)))
+ (enable-theme 'doom-ir-black)
 
 (use-package affe
   :config
@@ -271,11 +281,23 @@
 	 ("M-s" . consult-line)
 	 ("C-c o" . consult-file-externally))
 
+(use-package diff-at-point
+  :ensure t)
+
 (use-package diff-hl
-  :ensure t
-  :hook ('prog-mode . 'diff-hl-margin-mode)
-	('plain-TeX-mode-hook . 'diff-hl-margin-mode)
-	(org-mode . 'diff-hl-margin-mode))
+    :ensure t
+    :config (global-diff-hl-mode)
+    :hook (dired-mode . diff-hl-dired-mode))
+
+(defun my-fringe-hook ()
+  (setq left-fringe-width 3
+	right-fringe-width 0))
+
+  (add-hook 'prog-mode-hook 'my-fringe-hook)
+  (add-hook 'org-mode-hook 'my-fringe-hook)
+  (add-hook 'dired-mode-hook 'my-fringe-hook)
+
+(add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 (use-package eglot-jl
   :ensure t)
@@ -303,23 +325,25 @@
     (pdf-tools-install))
 
 (use-package popper
-  :ensure t ; or :straight t
+  :ensure t
   :bind (("C-S-p"   . popper-toggle-latest)
 	 ("C-S-z"   . popper-cycle)
 	 ("C-M-`" . popper-toggle-type))
   :init
   (setq popper-reference-buffers
-	'("\\*Messages\\*"
-	  "Output\\*$"
-	  "\\*Async Shell Command\\*"
+	'("\\*Async Shell Command\\*"
 	  "\\*elfeed-search\\*"
 	  "\\*julia\\*"
-	  eshell-mode
+	  "\\*vterm\\*"
+	  "\\*eldoc\\*"
+	  Man-mode
+	  eldoc-mode
 	  help-mode
 	  compilation-mode
 	  pdf-outline-buffer-mode))
   (popper-mode +1)
-  (popper-echo-mode +1))
+  (popper-echo-mode +1)
+  :custom (popper-mode-line nil))
 
 (use-package pulsar
   :ensure t
@@ -347,48 +371,48 @@
   :ensure t)
 
 (defun my/windmove-right ()
-  "change focus to the window on the right it is exists, otherwise change focus to the left"
-  (interactive)
-  (cond
-   ((window-in-direction 'right) (windmove-right))
-   ((window-in-direction 'left)  (windmove-left))))
+    "change focus to the window on the right it is exists, otherwise change focus to the left"
+    (interactive)
+    (cond
+     ((window-in-direction 'right) (windmove-right))
+     ((window-in-direction 'left)  (windmove-left))))
 
-(defun my/windmove-left ()
-  "change focus to the window on the left it is exists, otherwise change focus to the right"
-  (interactive)
-  (cond
-   ((window-in-direction 'left) (windmove-left))
-   ((window-in-direction 'right)  (windmove-right))))
+  (defun my/windmove-left ()
+    "change focus to the window on the left it is exists, otherwise change focus to the right"
+    (interactive)
+    (cond
+     ((window-in-direction 'left) (windmove-left))
+     ((window-in-direction 'right)  (windmove-right))))
 
-(defun my/windmove-up ()
-  "change focus to the window above it is exists, otherwise change focus to the window below"
-  (interactive)
-  (cond
-   ((window-in-direction 'above) (windmove-up))
-   ((window-in-direction 'below)  (windmove-down))))
+  (defun my/windmove-up ()
+    "change focus to the window above it is exists, otherwise change focus to the window below"
+    (interactive)
+    (cond
+     ((window-in-direction 'above) (windmove-up))
+     ((window-in-direction 'below)  (windmove-down))))
 
-(defun my/windmove-down ()
-  "change focus to the window below it is exists, otherwise change focus to the window above"
-  (interactive)
-  (cond
-   ((window-in-direction 'below) (windmove-down))
-   ((window-in-direction 'above)  (windmove-up))))
+  (defun my/windmove-down ()
+    "change focus to the window below it is exists, otherwise change focus to the window above"
+    (interactive)
+    (cond
+     ((window-in-direction 'below) (windmove-down))
+     ((window-in-direction 'above)  (windmove-up))))
 
 
-;; unbind clone buffer in info mode and bind windmove down
-(add-hook 'Info-mode-hook (lambda () (progn (local-unset-key (kbd "M-n"))
-					    (local-set-key (kbd "M-n") 'my/windmove-down))))
+  ;; unbind clone buffer in info mode and bind windmove down
+  (add-hook 'Info-mode-hook (lambda () (progn (local-unset-key (kbd "M-n"))
+					      (local-set-key (kbd "M-n") 'my/windmove-down))))
 
-(global-set-key (kbd "M-n") 'my/windmove-down)
-(global-set-key (kbd "M-p") 'my/windmove-up)
-(global-set-key (kbd "M-f") 'my/windmove-right)
-(global-set-key (kbd "M-b") 'my/windmove-left)
+;;   (global-set-key (kbd "M-n") 'my/windmove-down)
+;;   (global-set-key (kbd "M-p") 'my/windmove-up)
+;;   (global-set-key (kbd "M-f") 'my/windmove-right)
+;;   (global-set-key (kbd "M-b") 'my/windmove-left)
 
-(global-set-key (kbd "M-N") 'flip-frame)
-(global-set-key (kbd "M-P") 'flip-frame)
-(global-set-key (kbd "M-F") 'flop-frame)
-(global-set-key (kbd "M-B") 'flop-frame)
-(global-set-key (kbd "M-R") 'transpose-frame)
+  (global-set-key (kbd "M-N") 'flip-frame)
+  (global-set-key (kbd "M-P") 'flip-frame)
+  (global-set-key (kbd "M-F") 'flop-frame)
+  (global-set-key (kbd "M-B") 'flop-frame)
+  (global-set-key (kbd "M-R") 'transpose-frame)
 
 (use-package xclip
   :ensure t
@@ -399,3 +423,4 @@
   :config
   (setq gnugo-xpms 'gnugo-imgen-create-xpms)
   (setq gnugo-imgen-style 'ttn))
+(put 'dired-find-alternate-file 'disabled nil)

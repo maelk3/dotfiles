@@ -12,11 +12,10 @@ alias edit="emacs --no-desktop -nw"
 alias ec="emacsclient -c"
 alias ect="emacsclient -t"
 
-PS1='\[\033[01;31m\][\[\033[01;36m\]\h\[\033[01;32m\]@\[\033[01;34m\]\u \[\033[01;33m\]\w\[\033[01;31m\]]\e[m\]$ '
+# PS1='\[\033[01;31m\][\[\033[01;36m\]\h\[\033[01;32m\]@\[\033[01;34m\]\u \[\033[01;33m\]\w\[\033[01;31m\]]\[\e[m\]$ '
+PS1='\[\033[01;31m\]\[\033[01;36m\]\h\[\033[01;32m\]@\[\033[01;34m\]\u \[\033[01;33m\]\w\[\033[01;31m\]⟩\[\e[m\] '
 
 alias ..='cd ..'
-
-alias minesweeper='~/projects/programming/minesweeper/minesweeper.py'
 
 source /usr/share/fzf/completion.bash
 source /usr/share/fzf/key-bindings.bash
@@ -75,4 +74,5 @@ export LESS_TERMCAP_ZV=$(tput rsubm)
 export LESS_TERMCAP_ZO=$(tput ssupm)
 export LESS_TERMCAP_ZW=$(tput rsupm)
 
-export PATH=$PATH:/~/.scripts
+export PATH=$PATH:/~/.scripts:/opt/rocm/bin
+. "$HOME/.cargo/env"

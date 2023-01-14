@@ -74,8 +74,8 @@ We also disable the close button for emacs tabs.
   (setq tex-fontify-script nil)
   (setq font-latex-fontify-script nil)
 
-  (fringe-mode 0)
-
+  (set-fringe-mode '(1 . 1))
+  
   (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'latex-mode-hook  #'display-line-numbers-mode)
@@ -88,15 +88,16 @@ We also disable the close button for emacs tabs.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-o") 'other-window)
-  ;; (repeat-mode)
+  (repeat-mode)
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches "-al --group-directories-first")
   (setq scroll-conservatively 101)
   (setq scroll-margin 4)
   (setq gc-cons-threshold 100000000)
   (winner-mode)
-  (setq window-min-width 100)
-  (setq window-min-height 20)
+  (setq window-min-width 50)
+  (setq window-min-height 10)
+  (defalias 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
 *** Font setup and theme
@@ -359,22 +360,31 @@ provides fuzzy finding.
 The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ packages with some modifications, mainly a more subtle status bar.
 
 #+begin_src emacs-lisp
-  (use-package doom-themes
-    :ensure t)
+   (use-package doom-themes
+     :ensure t)
 
-  (custom-set-variables
-   '(custom-enabled-themes '(doom-ir-black)))
+  ;; (setq custom--inhibit-theme-enable nil)
+  (load-theme 'doom-ir-black)
 
-   (custom-theme-set-faces
-    'doom-ir-black
-    '(doom-modeline-bar-inactive ((t (:background "grey6"))))
-    '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
-    '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
-    '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
-    '(org-block ((t (:extend t :background "grey6")))))
+    (custom-theme-set-faces
+     'doom-ir-black
+     '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+     '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+     '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+     '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+     '(org-block ((t (:extend t :background "grey5"))))
+     '(diff-removed ((t (:background "#121212"))))
+     '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
+     '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
+     '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
+     '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+     '(dired-directory ((t (:foreground "coral" :weight bold))))
+     '(font-lock-builtin-face ((t (:foreground "wheat2"))))
+     '(outline-2 ((t (:foreground "coral"))))
+     '(outline-3 ((t (:foreground "#99CC99"))))
+     '(outline-4 ((t (:foreground "wheat2")))))
 
-   (custom-set-variables
-    '(custom-enabled-themes '(doom-ir-black)))
+   (enable-theme 'doom-ir-black)
 #+end_src
 
 ** Miscellaneous
@@ -440,14 +450,33 @@ are either used via the minibuffer are bound to keybindings.
 	     ("C-c o" . consult-file-externally))
 #+end_src
 
+*** Diff-at-point
+
+#+begin_src emacs-lisp
+  (use-package diff-at-point
+    :ensure t)
+#+end_src
 *** Diff-hl
 
 #+begin_src emacs-lisp
   (use-package diff-hl
-    :ensure t
-    :hook ('prog-mode . 'diff-hl-margin-mode)
-	  ('plain-TeX-mode-hook . 'diff-hl-margin-mode)
-	  (org-mode . 'diff-hl-margin-mode))
+      :ensure t
+      :config (global-diff-hl-mode)
+      :hook (dired-mode . diff-hl-dired-mode))
+
+  (defun my-fringe-hook ()
+    (setq left-fringe-width 3
+	  right-fringe-width 0))
+
+    (add-hook 'prog-mode-hook 'my-fringe-hook)
+    (add-hook 'org-mode-hook 'my-fringe-hook)
+    (add-hook 'dired-mode-hook 'my-fringe-hook)    
+#+end_src
+
+*** Dired
+
+#+begin_src emacs-lisp
+  (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 #+end_src
 
 *** Eglot
@@ -495,23 +524,24 @@ negligeable.
 
 #+BEGIN_SRC emacs-lisp
   (use-package popper
-    :ensure t ; or :straight t
+    :ensure t
     :bind (("C-S-p"   . popper-toggle-latest)
 	   ("C-S-z"   . popper-cycle)
 	   ("C-M-`" . popper-toggle-type))
     :init
     (setq popper-reference-buffers
-	  '("\\*Messages\\*"
-	    "Output\\*$"
-	    "\\*Async Shell Command\\*"
+	  '("\\*Async Shell Command\\*"
 	    "\\*elfeed-search\\*"
 	    "\\*julia\\*"
-	    eshell-mode
+	    "\\*vterm\\*"
+	    "\\*eldoc\\*"
+	    eldoc-mode
 	    help-mode
 	    compilation-mode
 	    pdf-outline-buffer-mode))
     (popper-mode +1)
-    (popper-echo-mode +1))
+    (popper-echo-mode +1)
+    :custom (popper-mode-line nil))
 #+END_SRC
 
 *** Pulsar
@@ -565,49 +595,49 @@ bound these modification to the keybindings ~M-{n,p,f,b}~ for changing
 frame and ~M-{N,P,F,B}~ for switching buffers.
 
 #+begin_src emacs-lisp
-  (defun my/windmove-right ()
-    "change focus to the window on the right it is exists, otherwise change focus to the left"
-    (interactive)
-    (cond
-     ((window-in-direction 'right) (windmove-right))
-     ((window-in-direction 'left)  (windmove-left))))
+    (defun my/windmove-right ()
+      "change focus to the window on the right it is exists, otherwise change focus to the left"
+      (interactive)
+      (cond
+       ((window-in-direction 'right) (windmove-right))
+       ((window-in-direction 'left)  (windmove-left))))
 
-  (defun my/windmove-left ()
-    "change focus to the window on the left it is exists, otherwise change focus to the right"
-    (interactive)
-    (cond
-     ((window-in-direction 'left) (windmove-left))
-     ((window-in-direction 'right)  (windmove-right))))
+    (defun my/windmove-left ()
+      "change focus to the window on the left it is exists, otherwise change focus to the right"
+      (interactive)
+      (cond
+       ((window-in-direction 'left) (windmove-left))
+       ((window-in-direction 'right)  (windmove-right))))
 
-  (defun my/windmove-up ()
-    "change focus to the window above it is exists, otherwise change focus to the window below"
-    (interactive)
-    (cond
-     ((window-in-direction 'above) (windmove-up))
-     ((window-in-direction 'below)  (windmove-down))))
+    (defun my/windmove-up ()
+      "change focus to the window above it is exists, otherwise change focus to the window below"
+      (interactive)
+      (cond
+       ((window-in-direction 'above) (windmove-up))
+       ((window-in-direction 'below)  (windmove-down))))
 
-  (defun my/windmove-down ()
-    "change focus to the window below it is exists, otherwise change focus to the window above"
-    (interactive)
-    (cond
-     ((window-in-direction 'below) (windmove-down))
-     ((window-in-direction 'above)  (windmove-up))))
+    (defun my/windmove-down ()
+      "change focus to the window below it is exists, otherwise change focus to the window above"
+      (interactive)
+      (cond
+       ((window-in-direction 'below) (windmove-down))
+       ((window-in-direction 'above)  (windmove-up))))
 
 
-  ;; unbind clone buffer in info mode and bind windmove down
-  (add-hook 'Info-mode-hook (lambda () (progn (local-unset-key (kbd "M-n"))
-					      (local-set-key (kbd "M-n") 'my/windmove-down))))
+    ;; unbind clone buffer in info mode and bind windmove down
+    (add-hook 'Info-mode-hook (lambda () (progn (local-unset-key (kbd "M-n"))
+						(local-set-key (kbd "M-n") 'my/windmove-down))))
 
-  (global-set-key (kbd "M-n") 'my/windmove-down)
-  (global-set-key (kbd "M-p") 'my/windmove-up)
-  (global-set-key (kbd "M-f") 'my/windmove-right)
-  (global-set-key (kbd "M-b") 'my/windmove-left)
+  ;;   (global-set-key (kbd "M-n") 'my/windmove-down)
+  ;;   (global-set-key (kbd "M-p") 'my/windmove-up)
+  ;;   (global-set-key (kbd "M-f") 'my/windmove-right)
+  ;;   (global-set-key (kbd "M-b") 'my/windmove-left)
 
-  (global-set-key (kbd "M-N") 'flip-frame)
-  (global-set-key (kbd "M-P") 'flip-frame)
-  (global-set-key (kbd "M-F") 'flop-frame)
-  (global-set-key (kbd "M-B") 'flop-frame)
-  (global-set-key (kbd "M-R") 'transpose-frame)
+    (global-set-key (kbd "M-N") 'flip-frame)
+    (global-set-key (kbd "M-P") 'flip-frame)
+    (global-set-key (kbd "M-F") 'flop-frame)
+    (global-set-key (kbd "M-B") 'flop-frame)
+    (global-set-key (kbd "M-R") 'transpose-frame)
 
 #+end_src
 

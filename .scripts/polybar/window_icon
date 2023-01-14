@@ -13,7 +13,11 @@ do
     elif [[ $window_class == "Zathura" ]]; then
 	icon="%{F#6edbff}%{F-}"
     elif [[ $window_class == "Alacritty" ]]; then
-	icon="%{F#42f569}%{F-}"	
+	icon="%{F#42f569}%{F-}"
+    elif [[ $window_class == "mpv" ]]; then
+	icon="%{F#ff6e6e}%{F-}"
+    elif [[ $window_class == "vlc" ]]; then
+	icon="%{F#ff8400}嗢%{F-}"	
     else
 	icon="%{F#ff6e6e}%{F-}"
     fi
