@@ -2,6 +2,7 @@
 #+PROPERTY: header-args:emacs-lisp :tangle ./init.el :mkdirp yes
 
 * TODO make eglot hook async to prevent emacs from freezing
+* TODO fix keybinding not loaded properly (e.g C-x v ] diff-hl)
 
 * Base configuration
 
@@ -75,7 +76,7 @@ We also disable the close button for emacs tabs.
   (setq font-latex-fontify-script nil)
 
   (set-fringe-mode '(1 . 1))
-  
+
   (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'latex-mode-hook  #'display-line-numbers-mode)
@@ -84,6 +85,9 @@ We also disable the close button for emacs tabs.
   (setq tab-bar-close-button-show nil)
   (setq tab-bar-new-button-show nil)
   (global-hl-line-mode t)
+
+  (add-hook 'prog-mode-hook
+          (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -114,6 +118,7 @@ We also disable the close button for emacs tabs.
 
   ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   ;; (setq highlight-indent-guides-method 'character)
+  (savehist-mode 1)
 #+end_src
 
 * Package specific configuration
@@ -136,8 +141,8 @@ We also disable the close button for emacs tabs.
 *** Magit
 
 #+begin_src emacs-lisp
-  (use-package magit
-    :ensure t)
+  (require 'magit)
+  (require 'magit-extras)
 #+end_src
 
 ** Julia
@@ -360,42 +365,38 @@ provides fuzzy finding.
 The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ packages with some modifications, mainly a more subtle status bar.
 
 #+begin_src emacs-lisp
-   (use-package doom-themes
-     :ensure t)
+  (use-package doom-themes
+    :ensure t)
 
   ;; (setq custom--inhibit-theme-enable nil)
   (load-theme 'doom-ir-black)
 
-    (custom-theme-set-faces
-     'doom-ir-black
-     '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
-     '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
-     '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
-     '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
-     '(org-block ((t (:extend t :background "grey5"))))
-     '(diff-removed ((t (:background "#121212"))))
-     '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
-     '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
-     '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
-     '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
-     '(dired-directory ((t (:foreground "coral" :weight bold))))
-     '(font-lock-builtin-face ((t (:foreground "wheat2"))))
-     '(outline-2 ((t (:foreground "coral"))))
-     '(outline-3 ((t (:foreground "#99CC99"))))
-     '(outline-4 ((t (:foreground "wheat2")))))
+  (custom-theme-set-faces
+   'doom-ir-black
+   '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+   '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+   '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+   '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+   '(org-block ((t (:extend t :background "grey5"))))
+   '(diff-removed ((t (:background "#121212"))))
+   '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
+   '(diff-refine-removed ((t (:foreground "#ff6c60ww" :background "#4f3438" :weight bold))))
+   '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
+   '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+   '(dired-directory ((t (:foreground "coral" :weight bold))))
+   '(font-lock-builtin-face ((t (:foreground "wheat2"))))
+   '(outline-2 ((t (:foreground "coral"))))
+   '(outline-3 ((t (:foreground "#99CC99"))))
+   '(outline-4 ((t (:foreground "wheat2"))))
+   '(font-lock-keyword-face ((t (:foreground "#96cbfe" :weight bold))))
+   '(font-lock-preprocessor-face ((t (:foreground "#ffabfb" :weight bold))))
+   '(Man-overstrike ((t (:foreground "#96cbfe" :weight bold))))
+   '(Man-underline ((t (:foreground "wheat2" :underline t)))))
 
-   (enable-theme 'doom-ir-black)
+  (enable-theme 'doom-ir-black)
 #+end_src
 
 ** Miscellaneous
-*** Affe
-
-#+begin_src emacs-lisp
-  (use-package affe
-    :config
-    ;; Manual preview key for `affe-grep'
-    (consult-customize affe-grep :preview-key (kbd "M-.")))
-#+end_src
 
 *** Autothemer
 
@@ -459,24 +460,26 @@ are either used via the minibuffer are bound to keybindings.
 *** Diff-hl
 
 #+begin_src emacs-lisp
-  (use-package diff-hl
-      :ensure t
-      :config (global-diff-hl-mode)
-      :hook (dired-mode . diff-hl-dired-mode))
+  (require 'diff-hl)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (global-diff-hl-mode)
 
   (defun my-fringe-hook ()
-    (setq left-fringe-width 3
-	  right-fringe-width 0))
+    (setq left-fringe-width 4
+	  right-fringe-width 10))
 
     (add-hook 'prog-mode-hook 'my-fringe-hook)
     (add-hook 'org-mode-hook 'my-fringe-hook)
-    (add-hook 'dired-mode-hook 'my-fringe-hook)    
+    (add-hook 'dired-mode-hook 'my-fringe-hook)
 #+end_src
 
 *** Dired
 
 #+begin_src emacs-lisp
   (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+
+  (setq dired-listing-switches "-alh --group-directories-first")
+  (add-hook 'dired-mode-hook 'dired-omit-mode)
 #+end_src
 
 *** Eglot
@@ -531,7 +534,7 @@ negligeable.
     :init
     (setq popper-reference-buffers
 	  '("\\*Async Shell Command\\*"
-	    "\\*elfeed-search\\*"
+	    ;; "\\*elfeed-search\\*"
 	    "\\*julia\\*"
 	    "\\*vterm\\*"
 	    "\\*eldoc\\*"

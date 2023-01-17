@@ -37,6 +37,9 @@
 (setq tab-bar-new-button-show nil)
 (global-hl-line-mode t)
 
+(add-hook 'prog-mode-hook
+        (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
+
 (global-set-key (kbd "M-o") 'other-window)
 (repeat-mode)
 (setq delete-by-moving-to-trash t)
@@ -60,6 +63,7 @@
 
 ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 ;; (setq highlight-indent-guides-method 'character)
+(savehist-mode 1)
 
 ;; (use-package irony
 ;;   :ensure t
@@ -69,8 +73,8 @@
 
 (setq vc-follow-symlinks t)
 
-(use-package magit
-  :ensure t)
+(require 'magit)
+(require 'magit-extras)
 
 (use-package julia-mode
   :ensure t)
@@ -216,35 +220,34 @@
   :init (setq elfeed-show-entry-switch 'display-buffer))
 
 (use-package doom-themes
-   :ensure t)
+  :ensure t)
 
 ;; (setq custom--inhibit-theme-enable nil)
 (load-theme 'doom-ir-black)
 
-  (custom-theme-set-faces
-   'doom-ir-black
-   '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
-   '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
-   '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
-   '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
-   '(org-block ((t (:extend t :background "grey5"))))
-   '(diff-removed ((t (:background "#121212"))))
-   '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
-   '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
-   '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
-   '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
-   '(dired-directory ((t (:foreground "coral" :weight bold))))
-   '(font-lock-builtin-face ((t (:foreground "wheat2"))))
-   '(outline-2 ((t (:foreground "coral"))))
-   '(outline-3 ((t (:foreground "#99CC99"))))
-   '(outline-4 ((t (:foreground "wheat2")))))
+(custom-theme-set-faces
+ 'doom-ir-black
+ '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+ '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
+ '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
+ '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+ '(org-block ((t (:extend t :background "grey5"))))
+ '(diff-removed ((t (:background "#121212"))))
+ '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
+ '(diff-refine-removed ((t (:foreground "#ff6c60ww" :background "#4f3438" :weight bold))))
+ '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
+ '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+ '(dired-directory ((t (:foreground "coral" :weight bold))))
+ '(font-lock-builtin-face ((t (:foreground "wheat2"))))
+ '(outline-2 ((t (:foreground "coral"))))
+ '(outline-3 ((t (:foreground "#99CC99"))))
+ '(outline-4 ((t (:foreground "wheat2"))))
+ '(font-lock-keyword-face ((t (:foreground "#96cbfe" :weight bold))))
+ '(font-lock-preprocessor-face ((t (:foreground "#ffabfb" :weight bold))))
+ '(Man-overstrike ((t (:foreground "#96cbfe" :weight bold))))
+ '(Man-underline ((t (:foreground "wheat2" :underline t)))))
 
- (enable-theme 'doom-ir-black)
-
-(use-package affe
-  :config
-  ;; Manual preview key for `affe-grep'
-  (consult-customize affe-grep :preview-key (kbd "M-.")))
+(enable-theme 'doom-ir-black)
 
 (use-package autothemer
   :ensure t)
@@ -284,20 +287,22 @@
 (use-package diff-at-point
   :ensure t)
 
-(use-package diff-hl
-    :ensure t
-    :config (global-diff-hl-mode)
-    :hook (dired-mode . diff-hl-dired-mode))
+(require 'diff-hl)
+(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+(global-diff-hl-mode)
 
 (defun my-fringe-hook ()
-  (setq left-fringe-width 3
-	right-fringe-width 0))
+  (setq left-fringe-width 4
+	right-fringe-width 10))
 
   (add-hook 'prog-mode-hook 'my-fringe-hook)
   (add-hook 'org-mode-hook 'my-fringe-hook)
   (add-hook 'dired-mode-hook 'my-fringe-hook)
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+
+(setq dired-listing-switches "-alh --group-directories-first")
+(add-hook 'dired-mode-hook 'dired-omit-mode)
 
 (use-package eglot-jl
   :ensure t)
@@ -332,11 +337,10 @@
   :init
   (setq popper-reference-buffers
 	'("\\*Async Shell Command\\*"
-	  "\\*elfeed-search\\*"
+	  ;; "\\*elfeed-search\\*"
 	  "\\*julia\\*"
 	  "\\*vterm\\*"
 	  "\\*eldoc\\*"
-	  Man-mode
 	  eldoc-mode
 	  help-mode
 	  compilation-mode
