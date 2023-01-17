@@ -73,8 +73,9 @@
 
 (setq vc-follow-symlinks t)
 
-(require 'magit)
-(require 'magit-extras)
+(use-package magit
+  :ensure t
+  :config (require 'magit-extras))
 
 (use-package julia-mode
   :ensure t)
@@ -94,11 +95,11 @@
 
 (use-package all-the-icons-dired
   :ensure t
-  :init (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+  :config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
 (use-package all-the-icons-completion
   :ensure t
-  :init (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+  :config (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 
 ;; (use-package doom-modeline
 ;;   :ensure t
@@ -134,9 +135,8 @@
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)
-  (corfu-doc-mode))
+  :config
+  (global-corfu-mode))
 ;; (use-package kind-icon
 ;;   :ensure t
 ;;   :after corfu
@@ -153,7 +153,7 @@
    ("M-:" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
-  :init
+  :config
 
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command))
@@ -170,14 +170,15 @@
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package vertico
+  :ensure t
   :config (vertico-mode)
-          (setq vertico-cycle t))
+	  (setq vertico-cycle t))
 
 (use-package marginalia
   :bind (("M-A" . marginalia-cycle)
 	 :map minibuffer-local-map
 	 ("M-A" . marginalia-cycle))
-  :init (marginalia-mode))
+  :config (marginalia-mode))
 
 (use-package orderless
            :ensure t
@@ -217,7 +218,7 @@
 
 (use-package elfeed
   :ensure t
-  :init (setq elfeed-show-entry-switch 'display-buffer))
+  :config (setq elfeed-show-entry-switch 'display-buffer))
 
 (use-package doom-themes
   :ensure t)
@@ -258,7 +259,7 @@
   ;; Alternative prefix keys: C-c p, M-p, M-+, ...
   :bind (
 	 ("M-/" . cape-dabbrev))
-  :init
+  :config
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -287,17 +288,20 @@
 (use-package diff-at-point
   :ensure t)
 
-(require 'diff-hl)
-(add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-(global-diff-hl-mode)
+(use-package diff-hl
+  :ensure t
+  :config
+  (require 'diff-hl)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (global-diff-hl-mode))
 
 (defun my-fringe-hook ()
   (setq left-fringe-width 4
 	right-fringe-width 10))
 
-  (add-hook 'prog-mode-hook 'my-fringe-hook)
-  (add-hook 'org-mode-hook 'my-fringe-hook)
-  (add-hook 'dired-mode-hook 'my-fringe-hook)
+(add-hook 'prog-mode-hook 'my-fringe-hook)
+(add-hook 'org-mode-hook 'my-fringe-hook)
+(add-hook 'dired-mode-hook 'my-fringe-hook)
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
@@ -334,7 +338,7 @@
   :bind (("C-S-p"   . popper-toggle-latest)
 	 ("C-S-z"   . popper-cycle)
 	 ("C-M-`" . popper-toggle-type))
-  :init
+  :config
   (setq popper-reference-buffers
 	'("\\*Async Shell Command\\*"
 	  ;; "\\*elfeed-search\\*"
@@ -351,7 +355,7 @@
 
 (use-package pulsar
   :ensure t
-  :init (pulsar-global-mode 1)
+  :config (pulsar-global-mode 1)
   :custom (pulsar-pulse-functions '(other-window
 				    windmove-do-window-select
 				    mouse-set-point
@@ -427,4 +431,3 @@
   :config
   (setq gnugo-xpms 'gnugo-imgen-create-xpms)
   (setq gnugo-imgen-style 'ttn))
-(put 'dired-find-alternate-file 'disabled nil)
