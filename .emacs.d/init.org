@@ -86,12 +86,16 @@ We also disable the close button for emacs tabs.
   (setq tab-bar-new-button-show nil)
   (global-hl-line-mode t)
 
-  (add-hook 'prog-mode-hook
-          (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
+  ;; (add-hook 'prog-mode-hook
+  ;;         (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
 #+end_src
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "M-o") 'other-window)
+  (defun myprevious-window ()
+    (interactive)
+    (other-window -1))
+  (global-set-key (kbd "M-O") 'myprevious-window)
   (repeat-mode)
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches "-al --group-directories-first")
@@ -99,18 +103,47 @@ We also disable the close button for emacs tabs.
   (setq scroll-margin 4)
   (setq gc-cons-threshold 100000000)
   (winner-mode)
-  (setq window-min-width 50)
+  (setq window-min-width 25)
   (setq window-min-height 10)
   (defalias 'yes-or-no-p 'y-or-n-p)
+
+  (pixel-scroll-precision-mode)
+  (setq ring-bell-function 'ignore)
+  (setq display-line-numbers-grow-only t)
+  ;; (add-hook 'after-make-frame-functions #'toggle-frame-fullscreen)
+  ;; (display-battery-mode t)
+  (delete-selection-mode 1)
+  (savehist-mode)
+  ;; (setq-default show-trailing-whitespace t)
+  (recentf-mode 1)
+  (setq eldoc-echo-area-use-multiline-p nil)
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+  (global-set-key (kbd "C-c C-g") 'global-whitespace-mode)
+
+  (add-to-list 'default-frame-alist '(height . 50))
+  (add-to-list 'default-frame-alist '(width . 200))
+
+  (defun my-inhibit-startup-screen-always ()
+    "Startup screen inhibitor for `command-line-functions`.
+  Inhibits startup screen on the first unrecognised option."
+    (ignore (setq inhibit-startup-screen t)))
+
+  (add-hook 'command-line-functions #'my-inhibit-startup-screen-always)
 #+end_src
 
 *** Font setup and theme
 
 #+begin_src emacs-lisp
   (defun my-font-config (frame) (progn
-				  (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
-				  (set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-12")
-				  (set-face-attribute 'default nil :font "PragmataPro Mono Liga-12")))
+				  (set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
+				  (set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+				  (set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+  ;; (defun my-font-config (frame) (progn
+  ;; 				(set-face-attribute 'fixed-pitch nil :font "Essential PragmataPro-9")
+  ;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+  ;; 				(set-face-attribute 'default nil :font "Essential PragmataPro-9")))
 
   (if (daemonp)
       (add-hook 'after-make-frame-functions #'my-font-config)
@@ -125,6 +158,7 @@ We also disable the close button for emacs tabs.
 ** C++
 
 #+begin_src emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
   ;; (use-package irony
   ;;   :ensure t
   ;;   :config
@@ -194,11 +228,11 @@ Support for icons used in the doom modeline.
 The doom modeline provides a more aesthetic modeline with git status.
 
 #+begin_src emacs-lisp
-  ;; (use-package doom-modeline
-  ;;   :ensure t
-  ;;   :config (doom-modeline-mode 1)
-  ;;   (setq doom-modeline-height 30)
-  ;;   (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+  (use-package doom-modeline
+    :ensure t
+    :config (doom-modeline-mode 1)
+    :config (setq doom-modeline-height 20)
+    (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 #+end_src
 
 ** Minibuffer
@@ -251,7 +285,7 @@ The doom modeline provides a more aesthetic modeline with git status.
     :ensure t
 
     :bind
-    (("C-;" . embark-act)         ;; pick some comfortable binding
+    (("C-." . embark-act)         ;; pick some comfortable binding
      ("M-:" . embark-dwim)        ;; good alternative: M-.
      ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
@@ -376,16 +410,26 @@ The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ pa
 
   (custom-theme-set-faces
    'doom-ir-black
-   '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+   '(doom-modeline-bar-inactive ((t (:background "grey6"))))
+   '(doom-modeline-bar ((t (:background "grey15"))))
+   '(doom-modeline-persp-name ((t (:foreground "#99CC99" :slant normal))))
+   '(doom-modeline-persp-buffer-not-in-persp ((t (:foreground "#83898d" :slant normal))))
    '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
    '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
-   '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+   '(line-number-current-line ((t (:foreground "white"))))
+   '(line-number ((t (:foreground "#5B6268"))))
    '(org-block ((t (:extend t :background "grey5"))))
-   '(diff-removed ((t (:background "#121212"))))
+   '(diff-removed ((t (:background "#2b0000" :foreground "#cc564c"))))
+   '(diff-added ((t (:background "#1d2e10" :foreground "#A8FF60"))))
    '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
-   '(diff-refine-removed ((t (:foreground "#ff6c60ww" :background "#4f3438" :weight bold))))
+   '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
    '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
-   '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+   '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))
+   '(diff-hunk-header ((t (:foreground "#a9a1e1" :background "#1e1c29"))))
+   '(ediff-current-diff-A ((t (:background "#4f3438" :foreground "#ff6c60"))))
+   '(ediff-current-diff-B ((t (:background "#213313" :foreground "#A8FF60"))))
+   '(ediff-fine-diff-A ((t (:background "#572d33" :foreground "#ff6c60"))))
+   '(ediff-fine-diff-B ((t (:background "#26450e" :foreground "#A8FF60"))))
    '(dired-directory ((t (:foreground "coral" :weight bold))))
    '(font-lock-builtin-face ((t (:foreground "wheat2"))))
    '(outline-2 ((t (:foreground "coral"))))
@@ -394,7 +438,12 @@ The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ pa
    '(font-lock-keyword-face ((t (:foreground "#96cbfe" :weight bold))))
    '(font-lock-preprocessor-face ((t (:foreground "#ffabfb" :weight bold))))
    '(Man-overstrike ((t (:foreground "#96cbfe" :weight bold))))
-   '(Man-underline ((t (:foreground "wheat2" :underline t)))))
+   '(Man-underline ((t (:foreground "wheat2" :underline t))))
+   '(pulsar-cyan ((t (:background "#96cbfe"))))
+   '(fixed-pitch ((t ())))
+   '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "grey34" :style flat-button)))))
+   '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box (:line-width (1 . 1) :color "gray6" :style flat-button)))))
+  '(isearch ((t (:background "#fac200" :foreground "#000000")))))
 
   (enable-theme 'doom-ir-black)
 #+end_src
@@ -421,9 +470,9 @@ The theme I currently use is the ~doom-ir-black~ theme from the ~doom-themes~ pa
     ;; Add `completion-at-point-functions', used by `completion-at-point'.
     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)
-    ;;(add-to-list 'completion-at-point-functions #'cape-history)
-    ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-    ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+    (add-to-list 'completion-at-point-functions #'cape-history)
+    (add-to-list 'completion-at-point-functions #'cape-keyword)
+    (add-to-list 'completion-at-point-functions #'cape-tex)
     ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
     ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
     ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
@@ -443,15 +492,15 @@ commands such as ~consult-yank-pop~, ~consult-{theme,man,line,imenu}~
 are either used via the minibuffer are bound to keybindings.
 
 #+begin_src emacs-lisp
-    (use-package consult
-      :ensure t
-      :bind ("C-x b" . consult-buffer)
-	     ("C-x C-b" . consult-buffer-other-window)
-	     ("C-x p b" . consult-project-buffer)
-	     ("C-c s" . consult-imenu-multi)
-	     ("M-y" . consult-yank-pop)
-	     ("M-s" . consult-line)
-	     ("C-c o" . consult-file-externally))
+  (use-package consult
+    :ensure t
+    :bind ("C-x b" . consult-buffer)
+	   ;; ("C-x C-b" . consult-buffer-other-window)
+	   ("C-x p b" . consult-project-buffer)
+	   ("C-c s" . consult-imenu-multi)
+	   ("M-y" . consult-yank-pop)
+	   ("M-s" . consult-line)
+	   ("C-c o" . consult-file-externally))
 #+end_src
 
 *** Diff-at-point
@@ -471,12 +520,13 @@ are either used via the minibuffer are bound to keybindings.
     (global-diff-hl-mode))
 
   (defun my-fringe-hook ()
-    (setq left-fringe-width 4
+    (setq left-fringe-width 3
 	  right-fringe-width 10))
 
   (add-hook 'prog-mode-hook 'my-fringe-hook)
   (add-hook 'org-mode-hook 'my-fringe-hook)
   (add-hook 'dired-mode-hook 'my-fringe-hook)
+  (add-hook 'Man-mode-hook 'my-fringe-hook)
 #+end_src
 
 *** Dired
@@ -486,27 +536,59 @@ are either used via the minibuffer are bound to keybindings.
 
   (setq dired-listing-switches "-alh --group-directories-first")
   (add-hook 'dired-mode-hook 'dired-omit-mode)
+
+  ;; (use-package dired-git-info
+  ;;   :ensure t
+  ;;   :config (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable))
 #+end_src
 
 *** Eglot
 
 #+begin_src emacs-lisp
-      (use-package eglot-jl
-	:ensure t)
+  (use-package eglot-jl
+    :ensure t)
 
-      (defun my-julia-init ()
-	(progn
-	  (eglot-jl-init)
-	  (eglot-ensure)))
+  (defun my-julia-init ()
+    (progn
+      (eglot-jl-init)
+      (eglot-ensure)))
 
-      (use-package eglot
-	:ensure t
-	:config
-	(add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-	(add-hook 'c-mode-hook 'eglot-ensure)
-	(add-hook 'c++-mode-hook 'eglot-ensure)
-	(add-hook 'julia-mode-hook 'my-julia-init)
-	(setq eglot-connect-timeout 10000))
+  (use-package eglot
+    :ensure t
+    :config
+    ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+    ;; (add-hook 'c-mode-hook 'eglot-ensure)
+    ;; (add-hook 'c++-mode-hook 'eglot-ensure)
+    (add-hook 'julia-mode-hook 'my-julia-init)
+    (setq eglot-connect-timeout 10000))
+#+end_src
+
+*** Page-break-lines
+
+The package changes the formfeed ASCII character ^L by a line. This
+character is used in legacy elisp code as well as in buffer mode help.
+
+#+begin_src emacs-lisp
+    (use-package page-break-lines
+      :ensure t
+      :config (global-page-break-lines-mode))
+#+end_src
+
+*** Persp-mode
+
+#+begin_src emacs-lisp
+  ;; (if (daemonp)
+  ;;     (use-package persp-mode
+  ;;       :ensure t
+  ;;       :init (persp-mode)
+  ;;       (setq persp-add-buffer-on-after-change-major-mode t)
+  ;;       (setq persp-auto-save-opt 0)
+  ;;       (global-set-key (kbd "C-x b") #'(lambda (arg)
+  ;; 					(interactive "P")
+  ;; 					(with-persp-buffer-list () (consult-buffer arg))))
+  ;;       (global-set-key (kbd "C-x C-b") #'(lambda (arg)
+  ;; 					  (interactive "P")
+  ;; 					  (with-persp-buffer-list () (ibuffer arg))))))
 #+end_src
 
 *** Pdf-tools
@@ -544,32 +626,40 @@ negligeable.
 	    "\\*julia\\*"
 	    "\\*vterm\\*"
 	    "\\*eldoc\\*"
+	    "\\*Shell Command Output\\*"
+	    "\\*Async Shell Command Output\\*"
+	    Man-mode
 	    eldoc-mode
 	    help-mode
 	    compilation-mode
 	    pdf-outline-buffer-mode))
     (popper-mode +1)
     (popper-echo-mode +1)
+    (setq popper-group-function #'popper-group-by-project)
     :custom (popper-mode-line nil))
 #+END_SRC
 
 *** Pulsar
+
 #+begin_src  emacs-lisp
-      (use-package pulsar
-	:ensure t
-	:config (pulsar-global-mode 1)
-	:custom (pulsar-pulse-functions '(other-window
-					  windmove-do-window-select
-					  mouse-set-point
-					  mouse-select-window
-					  scroll-up-command
-					  scroll-down-command
-					  recenter-top-bottom
-					  isearch-repeat-forward
-					  isearch-repeat-backward
-					  beginning-of-buffer
-					  end-of-buffer)))
-#+end_src				      
+  (use-package pulsar
+    :ensure t
+    :config ;; (pulsar-global-mode 1)
+	    (setq pulsar-face 'pulsar-cyan)
+	    (setq pulsar-delay 0.05)
+    :custom (pulsar-pulse-functions '(other-window
+				      windmove-do-window-select
+				      mouse-set-point
+				      mouse-select-window
+				      scroll-up-command
+				      scroll-down-command
+				      recenter-top-bottom
+				      isearch-repeat-forward
+				      isearch-repeat-backward
+				      beginning-of-buffer
+				      end-of-buffer)))
+#+end_src
+
 *** Vterm
 
 We ensure the vterm package and set the keybinding ~M-T~ to open a new

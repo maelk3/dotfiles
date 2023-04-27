@@ -37,10 +37,14 @@
 (setq tab-bar-new-button-show nil)
 (global-hl-line-mode t)
 
-(add-hook 'prog-mode-hook
-        (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
+;; (add-hook 'prog-mode-hook
+;;         (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
 
 (global-set-key (kbd "M-o") 'other-window)
+(defun myprevious-window ()
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "M-O") 'myprevious-window)
 (repeat-mode)
 (setq delete-by-moving-to-trash t)
 (setq dired-listing-switches "-al --group-directories-first")
@@ -48,14 +52,43 @@
 (setq scroll-margin 4)
 (setq gc-cons-threshold 100000000)
 (winner-mode)
-(setq window-min-width 50)
+(setq window-min-width 25)
 (setq window-min-height 10)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+(pixel-scroll-precision-mode)
+(setq ring-bell-function 'ignore)
+(setq display-line-numbers-grow-only t)
+;; (add-hook 'after-make-frame-functions #'toggle-frame-fullscreen)
+;; (display-battery-mode t)
+(delete-selection-mode 1)
+(savehist-mode)
+;; (setq-default show-trailing-whitespace t)
+(recentf-mode 1)
+(setq eldoc-echo-area-use-multiline-p nil)
+(setq ediff-window-setup-function #'ediff-setup-windows-plain)
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-c C-g") 'global-whitespace-mode)
+
+(add-to-list 'default-frame-alist '(height . 50))
+(add-to-list 'default-frame-alist '(width . 200))
+
+(defun my-inhibit-startup-screen-always ()
+  "Startup screen inhibitor for `command-line-functions`.
+Inhibits startup screen on the first unrecognised option."
+  (ignore (setq inhibit-startup-screen t)))
+
+(add-hook 'command-line-functions #'my-inhibit-startup-screen-always)
+
 (defun my-font-config (frame) (progn
-				(set-face-attribute 'variable-pitch nil :font "Source Sans Pro-12")
-				(set-face-attribute 'fixed-pitch nil :font "PragmataPro Mono Liga-12")
-				(set-face-attribute 'default nil :font "PragmataPro Mono Liga-12")))
+				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
+				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+;; (defun my-font-config (frame) (progn
+;; 				(set-face-attribute 'fixed-pitch nil :font "Essential PragmataPro-9")
+;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+;; 				(set-face-attribute 'default nil :font "Essential PragmataPro-9")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
@@ -65,6 +98,7 @@
 ;; (setq highlight-indent-guides-method 'character)
 (savehist-mode 1)
 
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 ;; (use-package irony
 ;;   :ensure t
 ;;   :config
@@ -86,8 +120,9 @@
   :hook (julia-mode . julia-repl-mode))
 
 (use-package all-the-icons
+  :ensure t
   :config (setq all-the-icons-scale-factor 1.0)
-          (setq all-the-icons-fileicon-scale-factor 1.0))
+	  (setq all-the-icons-fileicon-scale-factor 1.0))
 
 (use-package all-the-icons-ibuffer
   :ensure t
@@ -101,11 +136,11 @@
   :ensure t
   :config (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
 
-;; (use-package doom-modeline
-;;   :ensure t
-;;   :config (doom-modeline-mode 1)
-;;   (setq doom-modeline-height 30)
-;;   (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+(use-package doom-modeline
+  :ensure t
+  :config (doom-modeline-mode 1)
+  :config (setq doom-modeline-height 20)
+  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package corfu
   :ensure t
@@ -149,7 +184,7 @@
   :ensure t
 
   :bind
-  (("C-;" . embark-act)         ;; pick some comfortable binding
+  (("C-." . embark-act)         ;; pick some comfortable binding
    ("M-:" . embark-dwim)        ;; good alternative: M-.
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
@@ -175,10 +210,11 @@
 	  (setq vertico-cycle t))
 
 (use-package marginalia
+  :ensure t
   :bind (("M-A" . marginalia-cycle)
 	 :map minibuffer-local-map
 	 ("M-A" . marginalia-cycle))
-  :config (marginalia-mode))
+  :init (marginalia-mode))
 
 (use-package orderless
            :ensure t
@@ -228,16 +264,26 @@
 
 (custom-theme-set-faces
  'doom-ir-black
- '(doom-modeline-bar-inactive ((t (:background "grey6"))))     
+ '(doom-modeline-bar-inactive ((t (:background "grey6"))))
+ '(doom-modeline-bar ((t (:background "grey15"))))
+ '(doom-modeline-persp-name ((t (:foreground "#99CC99" :slant normal))))
+ '(doom-modeline-persp-buffer-not-in-persp ((t (:foreground "#83898d" :slant normal))))
  '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
- '(line-number-current-line ((t (:inherit (hl-line default) :foreground "white" :slant italic :weight bold))))
+ '(line-number-current-line ((t (:foreground "white"))))
+ '(line-number ((t (:foreground "#5B6268"))))
  '(org-block ((t (:extend t :background "grey5"))))
- '(diff-removed ((t (:background "#121212"))))
+ '(diff-removed ((t (:background "#2b0000" :foreground "#cc564c"))))
+ '(diff-added ((t (:background "#1d2e10" :foreground "#A8FF60"))))
  '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
- '(diff-refine-removed ((t (:foreground "#ff6c60ww" :background "#4f3438" :weight bold))))
+ '(diff-refine-removed ((t (:foreground "#ff6c60" :background "#4f3438" :weight bold))))
  '(diff-hl-dired-ignored ((t (:foreground "#5B6268" :background "#5B6268"))))
- '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))     
+ '(diff-hl-dired-unknown ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))
+ '(diff-hunk-header ((t (:foreground "#a9a1e1" :background "#1e1c29"))))
+ '(ediff-current-diff-A ((t (:background "#4f3438" :foreground "#ff6c60"))))
+ '(ediff-current-diff-B ((t (:background "#213313" :foreground "#A8FF60"))))
+ '(ediff-fine-diff-A ((t (:background "#572d33" :foreground "#ff6c60"))))
+ '(ediff-fine-diff-B ((t (:background "#26450e" :foreground "#A8FF60"))))
  '(dired-directory ((t (:foreground "coral" :weight bold))))
  '(font-lock-builtin-face ((t (:foreground "wheat2"))))
  '(outline-2 ((t (:foreground "coral"))))
@@ -246,7 +292,12 @@
  '(font-lock-keyword-face ((t (:foreground "#96cbfe" :weight bold))))
  '(font-lock-preprocessor-face ((t (:foreground "#ffabfb" :weight bold))))
  '(Man-overstrike ((t (:foreground "#96cbfe" :weight bold))))
- '(Man-underline ((t (:foreground "wheat2" :underline t)))))
+ '(Man-underline ((t (:foreground "wheat2" :underline t))))
+ '(pulsar-cyan ((t (:background "#96cbfe"))))
+ '(fixed-pitch ((t ())))
+ '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "grey34" :style flat-button)))))
+ '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box (:line-width (1 . 1) :color "gray6" :style flat-button)))))
+'(isearch ((t (:background "#fac200" :foreground "#000000")))))
 
 (enable-theme 'doom-ir-black)
 
@@ -263,9 +314,9 @@
   ;; Add `completion-at-point-functions', used by `completion-at-point'.
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  ;;(add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-tex)
+  (add-to-list 'completion-at-point-functions #'cape-history)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-tex)
   ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
   ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
   ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
@@ -278,7 +329,7 @@
 (use-package consult
   :ensure t
   :bind ("C-x b" . consult-buffer)
-	 ("C-x C-b" . consult-buffer-other-window)
+	 ;; ("C-x C-b" . consult-buffer-other-window)
 	 ("C-x p b" . consult-project-buffer)
 	 ("C-c s" . consult-imenu-multi)
 	 ("M-y" . consult-yank-pop)
@@ -296,17 +347,22 @@
   (global-diff-hl-mode))
 
 (defun my-fringe-hook ()
-  (setq left-fringe-width 4
+  (setq left-fringe-width 3
 	right-fringe-width 10))
 
 (add-hook 'prog-mode-hook 'my-fringe-hook)
 (add-hook 'org-mode-hook 'my-fringe-hook)
 (add-hook 'dired-mode-hook 'my-fringe-hook)
+(add-hook 'Man-mode-hook 'my-fringe-hook)
 
 (add-hook 'dired-mode-hook 'dired-hide-details-mode)
 
 (setq dired-listing-switches "-alh --group-directories-first")
 (add-hook 'dired-mode-hook 'dired-omit-mode)
+
+;; (use-package dired-git-info
+;;   :ensure t
+;;   :config (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable))
 
 (use-package eglot-jl
   :ensure t)
@@ -319,11 +375,28 @@
 (use-package eglot
   :ensure t
   :config
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-  (add-hook 'c-mode-hook 'eglot-ensure)
-  (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  ;; (add-hook 'c-mode-hook 'eglot-ensure)
+  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
   (add-hook 'julia-mode-hook 'my-julia-init)
   (setq eglot-connect-timeout 10000))
+
+(use-package page-break-lines
+  :ensure t
+  :config (global-page-break-lines-mode))
+
+;; (if (daemonp)
+;;     (use-package persp-mode
+;;       :ensure t
+;;       :init (persp-mode)
+;;       (setq persp-add-buffer-on-after-change-major-mode t)
+;;       (setq persp-auto-save-opt 0)
+;;       (global-set-key (kbd "C-x b") #'(lambda (arg)
+;; 					(interactive "P")
+;; 					(with-persp-buffer-list () (consult-buffer arg))))
+;;       (global-set-key (kbd "C-x C-b") #'(lambda (arg)
+;; 					  (interactive "P")
+;; 					  (with-persp-buffer-list () (ibuffer arg))))))
 
 (use-package pdf-tools
   :ensure t
@@ -345,17 +418,23 @@
 	  "\\*julia\\*"
 	  "\\*vterm\\*"
 	  "\\*eldoc\\*"
+	  "\\*Shell Command Output\\*"
+	  "\\*Async Shell Command Output\\*"
+	  Man-mode
 	  eldoc-mode
 	  help-mode
 	  compilation-mode
 	  pdf-outline-buffer-mode))
   (popper-mode +1)
   (popper-echo-mode +1)
+  (setq popper-group-function #'popper-group-by-project)
   :custom (popper-mode-line nil))
 
 (use-package pulsar
   :ensure t
-  :config (pulsar-global-mode 1)
+  :config ;; (pulsar-global-mode 1)
+	  (setq pulsar-face 'pulsar-cyan)
+	  (setq pulsar-delay 0.05)
   :custom (pulsar-pulse-functions '(other-window
 				    windmove-do-window-select
 				    mouse-set-point
@@ -431,3 +510,4 @@
   :config
   (setq gnugo-xpms 'gnugo-imgen-create-xpms)
   (setq gnugo-imgen-style 'ttn))
+(put 'dired-find-alternate-file 'disabled nil)
