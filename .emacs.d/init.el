@@ -26,7 +26,7 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(set-fringe-mode '(1 . 1))
+(set-fringe-mode '(0 . 0))
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -41,25 +41,37 @@
 ;;         (lambda () (local-set-key (kbd "C-c C-c") #'recompile)))
 
 (global-set-key (kbd "M-o") 'other-window)
+
+(add-hook 'ibuffer-mode-hook
+	  (lambda()
+	    (local-unset-key (kbd "M-o"))
+	    (global-set-key (kbd "M-o") 'other-window)))
+
+(add-hook 'diff-mode-hook
+	  (lambda()
+	    (local-unset-key (kbd "M-o"))
+	    (global-set-key (kbd "M-o") 'other-window)))
+
 (defun myprevious-window ()
   (interactive)
   (other-window -1))
 (global-set-key (kbd "M-O") 'myprevious-window)
 (repeat-mode)
 (setq delete-by-moving-to-trash t)
+(setq dired-dwim-target t)
 (setq dired-listing-switches "-al --group-directories-first")
 (setq scroll-conservatively 101)
 (setq scroll-margin 4)
 (setq gc-cons-threshold 100000000)
 (winner-mode)
-(setq window-min-width 25)
+(setq window-min-width 100)
 (setq window-min-height 10)
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (pixel-scroll-precision-mode)
 (setq ring-bell-function 'ignore)
 (setq display-line-numbers-grow-only t)
-;; (add-hook 'after-make-frame-functions #'toggle-frame-fullscreen)
+;; (add-hook 'after-make-frame-functions #'ibuffer)
 ;; (display-battery-mode t)
 (delete-selection-mode 1)
 (savehist-mode)
@@ -76,19 +88,31 @@
 
 (defun my-inhibit-startup-screen-always ()
   "Startup screen inhibitor for `command-line-functions`.
-Inhibits startup screen on the first unrecognised option."
+	Inhibits startup screen on the first unrecognised option."
   (ignore (setq inhibit-startup-screen t)))
 
 (add-hook 'command-line-functions #'my-inhibit-startup-screen-always)
 
-(defun my-font-config (frame) (progn
-				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
-				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+(setq isearch-lazy-count t)
+(setq lazy-count-prefix-format "(%s/%s) ")
+(setq lazy-count-suffix-format nil)
+(setq search-whitespace-regexp ".*?")
+
+(setq set-mark-command-repeat-pop t)
+
+(global-set-key (kbd "M-;") 'comment-region)
+(global-set-key (kbd "M-k") 'bury-buffer)
+(global-set-key (kbd "M-K") 'kill-this-buffer)
+(global-set-key (kbd "C-c o") 'ff-find-other-file)
+
 ;; (defun my-font-config (frame) (progn
-;; 				(set-face-attribute 'fixed-pitch nil :font "Essential PragmataPro-9")
+;; 				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
 ;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-;; 				(set-face-attribute 'default nil :font "Essential PragmataPro-9")))
+;; 				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+(defun my-font-config (frame) (progn
+				(set-face-attribute 'fixed-pitch nil :font "Cascadia Code PL-8")
+				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+				(set-face-attribute 'default nil :font "Cascadia Code PL-8")))
 
 (if (daemonp)
     (add-hook 'after-make-frame-functions #'my-font-config)
@@ -97,6 +121,8 @@ Inhibits startup screen on the first unrecognised option."
 ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
 ;; (setq highlight-indent-guides-method 'character)
 (savehist-mode 1)
+
+(subword-mode)
 
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 ;; (use-package irony
@@ -139,7 +165,8 @@ Inhibits startup screen on the first unrecognised option."
 (use-package doom-modeline
   :ensure t
   :config (doom-modeline-mode 1)
-  :config (setq doom-modeline-height 20)
+  :config (setq doom-modeline-height 18)
+  ;; :config (setq doom-modeline-icon nil)
   (setq doom-modeline-buffer-file-name-style 'relative-from-project))
 
 (use-package corfu
@@ -259,19 +286,27 @@ Inhibits startup screen on the first unrecognised option."
 (use-package doom-themes
   :ensure t)
 
-;; (setq custom--inhibit-theme-enable nil)
+;; (load-theme 'ef-light)
+;; (custom-theme-set-faces
+;;  'ef-light
+;;  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "#065fff" :style flat-button)))))
+;;  '(mode-line-inactive ((t (:background "#dbdbdb" :foreground "#70627f" :box (:line-width (1 . 1) :color "#dbdbdb" :style flat-button)))))
+;;  '(doom-modeline-bar-inactive ((t (:background "#dbdbdb"))))
+;;  '(doom-modeline-bar ((t (:background "#b7c7ff")))))
+
 (load-theme 'doom-ir-black)
 
 (custom-theme-set-faces
  'doom-ir-black
  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
+ '(font-lock-comment-face ((t (:foreground "grey60"))))
  '(doom-modeline-bar ((t (:background "grey15"))))
  '(doom-modeline-persp-name ((t (:foreground "#99CC99" :slant normal))))
  '(doom-modeline-persp-buffer-not-in-persp ((t (:foreground "#83898d" :slant normal))))
  '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
- '(line-number-current-line ((t (:foreground "white"))))
- '(line-number ((t (:foreground "#5B6268"))))
+ '(line-number-current-line ((t (:foreground "white" :background "grey6"))))
+ '(line-number ((t (:foreground "#5B6268" :background "grey6"))))
  '(org-block ((t (:extend t :background "grey5"))))
  '(diff-removed ((t (:background "#2b0000" :foreground "#cc564c"))))
  '(diff-added ((t (:background "#1d2e10" :foreground "#A8FF60"))))
@@ -294,10 +329,11 @@ Inhibits startup screen on the first unrecognised option."
  '(Man-overstrike ((t (:foreground "#96cbfe" :weight bold))))
  '(Man-underline ((t (:foreground "wheat2" :underline t))))
  '(pulsar-cyan ((t (:background "#96cbfe"))))
+ '(ansi-color-bright-black ((t (:background "grey60" :foreground "grey60"))))
  '(fixed-pitch ((t ())))
  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "grey34" :style flat-button)))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box (:line-width (1 . 1) :color "gray6" :style flat-button)))))
-'(isearch ((t (:background "#fac200" :foreground "#000000")))))
+ '(isearch ((t (:background "#fac200" :foreground "#000000")))))
 
 (enable-theme 'doom-ir-black)
 
@@ -333,22 +369,21 @@ Inhibits startup screen on the first unrecognised option."
 	 ("C-x p b" . consult-project-buffer)
 	 ("C-c s" . consult-imenu-multi)
 	 ("M-y" . consult-yank-pop)
-	 ("M-s" . consult-line)
-	 ("C-c o" . consult-file-externally))
+	 ("M-s" . consult-line))
 
 (use-package diff-at-point
   :ensure t)
 
-(use-package diff-hl
-  :ensure t
-  :config
-  (require 'diff-hl)
-  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
-  (global-diff-hl-mode))
+;; (use-package diff-hl
+;;   :ensure t
+;;   :config
+;;   (require 'diff-hl)
+;;   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+;;   (global-diff-hl-mode))
 
 (defun my-fringe-hook ()
-  (setq left-fringe-width 3
-	right-fringe-width 10))
+  (setq left-fringe-width 0
+	right-fringe-width 0))
 
 (add-hook 'prog-mode-hook 'my-fringe-hook)
 (add-hook 'org-mode-hook 'my-fringe-hook)
@@ -364,21 +399,27 @@ Inhibits startup screen on the first unrecognised option."
 ;;   :ensure t
 ;;   :config (add-hook 'dired-after-readin-hook 'dired-git-info-auto-enable))
 
-(use-package eglot-jl
-  :ensure t)
+;; (use-package eglot-jl
+;;   :ensure t)
 
-(defun my-julia-init ()
+;; (defun my-julia-init ()
+;;   (progn
+;;     (eglot-jl-init)
+;;     (eglot-ensure)))
+
+(defun my-zig-init ()
   (progn
-    (eglot-jl-init)
     (eglot-ensure)))
 
 (use-package eglot
   :ensure t
   :config
-  ;; (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
-  ;; (add-hook 'c-mode-hook 'eglot-ensure)
-  ;; (add-hook 'c++-mode-hook 'eglot-ensure)
-  (add-hook 'julia-mode-hook 'my-julia-init)
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-to-list 'eglot-server-programs '(zig-mode . ("zls")))
+  (add-hook 'c-mode-hook 'eglot-ensure)
+  (add-hook 'c++-mode-hook 'eglot-ensure)
+  ;; (add-hook 'julia-mode-hook 'my-julia-init)
+  (add-hook 'zig-mode-hook 'my-zig-init)
   (setq eglot-connect-timeout 10000))
 
 (use-package page-break-lines
@@ -406,29 +447,29 @@ Inhibits startup screen on the first unrecognised option."
 (if (daemonp)
     (pdf-tools-install))
 
-(use-package popper
-  :ensure t
-  :bind (("C-S-p"   . popper-toggle-latest)
-	 ("C-S-z"   . popper-cycle)
-	 ("C-M-`" . popper-toggle-type))
-  :config
-  (setq popper-reference-buffers
-	'("\\*Async Shell Command\\*"
-	  ;; "\\*elfeed-search\\*"
-	  "\\*julia\\*"
-	  "\\*vterm\\*"
-	  "\\*eldoc\\*"
-	  "\\*Shell Command Output\\*"
-	  "\\*Async Shell Command Output\\*"
-	  Man-mode
-	  eldoc-mode
-	  help-mode
-	  compilation-mode
-	  pdf-outline-buffer-mode))
-  (popper-mode +1)
-  (popper-echo-mode +1)
-  (setq popper-group-function #'popper-group-by-project)
-  :custom (popper-mode-line nil))
+;; (use-package popper
+;;   :ensure t
+;;   :bind (("C-S-p"   . popper-toggle-latest)
+;; 	 ("C-S-z"   . popper-cycle)
+;; 	 ("C-M-`" . popper-toggle-type))
+;;   :config
+;;   (setq popper-reference-buffers
+;; 	'("\\*Async Shell Command\\*"
+;; 	  ;; "\\*elfeed-search\\*"
+;; 	  "\\*julia\\*"
+;; 	  "\\*vterm\\*"
+;; 	  "\\*eldoc\\*"
+;; 	  "\\*Shell Command Output\\*"
+;; 	  "\\*Async Shell Command Output\\*"
+;; 	  Man-mode
+;; 	  eldoc-mode
+;; 	  help-mode
+;; 	  compilation-mode
+;; 	  pdf-outline-buffer-mode))
+;;   (popper-mode +1)
+;;   (popper-echo-mode +1)
+;;   (setq popper-group-function #'popper-group-by-project)
+;;   :custom (popper-mode-line nil))
 
 (use-package pulsar
   :ensure t
