@@ -88,7 +88,7 @@
 
 (defun my-inhibit-startup-screen-always ()
   "Startup screen inhibitor for `command-line-functions`.
-	Inhibits startup screen on the first unrecognised option."
+	  Inhibits startup screen on the first unrecognised option."
   (ignore (setq inhibit-startup-screen t)))
 
 (add-hook 'command-line-functions #'my-inhibit-startup-screen-always)
@@ -105,24 +105,30 @@
 (global-set-key (kbd "M-K") 'kill-this-buffer)
 (global-set-key (kbd "C-c o") 'ff-find-other-file)
 
+(add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm")))
+
+(setq compile-command "make -j 8")
+
 ;; (defun my-font-config (frame) (progn
-;; 				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
-;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-;; 				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
-(defun my-font-config (frame) (progn
-				(set-face-attribute 'fixed-pitch nil :font "Cascadia Code PL-8")
-				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-				(set-face-attribute 'default nil :font "Cascadia Code PL-8")))
+  ;; 				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
+  ;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+  ;; 				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+  (defun my-font-config (frame) (progn
+				  (set-face-attribute 'fixed-pitch nil :font "Cascadia Code PL-8")
+				  (set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+				  (set-face-attribute 'default nil :font "Cascadia Code PL-8")))
 
-(if (daemonp)
-    (add-hook 'after-make-frame-functions #'my-font-config)
-  (my-font-config nil))
+(my-font-config nil)
 
-;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-;; (setq highlight-indent-guides-method 'character)
-(savehist-mode 1)
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions #'my-font-config)
+    (my-font-config nil))
 
-(subword-mode)
+  ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  ;; (setq highlight-indent-guides-method 'character)
+  (savehist-mode 1)
+
+  (subword-mode)
 
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 ;; (use-package irony
@@ -287,19 +293,23 @@
   :ensure t)
 
 ;; (load-theme 'ef-light)
+
 ;; (custom-theme-set-faces
 ;;  'ef-light
 ;;  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "#065fff" :style flat-button)))))
 ;;  '(mode-line-inactive ((t (:background "#dbdbdb" :foreground "#70627f" :box (:line-width (1 . 1) :color "#dbdbdb" :style flat-button)))))
 ;;  '(doom-modeline-bar-inactive ((t (:background "#dbdbdb"))))
 ;;  '(doom-modeline-bar ((t (:background "#b7c7ff")))))
+;; ;; (load-theme 'ef-light)
+
+;; (enable-theme 'ef-light)
 
 (load-theme 'doom-ir-black)
-
 (custom-theme-set-faces
  'doom-ir-black
  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
- '(font-lock-comment-face ((t (:foreground "grey60"))))
+ '(font-lock-comment-face ((t (:foreground "grey60" :slant oblique))))
+ '(font-lock-function-name-face ((t (:foreground "#d0b9f0"))))
  '(doom-modeline-bar ((t (:background "grey15"))))
  '(doom-modeline-persp-name ((t (:foreground "#99CC99" :slant normal))))
  '(doom-modeline-persp-buffer-not-in-persp ((t (:foreground "#83898d" :slant normal))))
@@ -333,7 +343,10 @@
  '(fixed-pitch ((t ())))
  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "grey34" :style flat-button)))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box (:line-width (1 . 1) :color "gray6" :style flat-button)))))
- '(isearch ((t (:background "#fac200" :foreground "#000000")))))
+ '(isearch ((t (:background "#fac200" :foreground "#000000"))))
+ '(font-lock-preprocessor-face ((t (:foreground "coral"))))
+ '(font-lock-string-face ((t (:foreground "SkyBlue1"))))
+ '(font-lock-variable-name-face ((t (:foreground "aquamarine3")))))
 
 (enable-theme 'doom-ir-black)
 
@@ -422,6 +435,21 @@
   (add-hook 'zig-mode-hook 'my-zig-init)
   (setq eglot-connect-timeout 10000))
 
+(use-package exec-path-from-shell
+  :ensure t)
+
+(when (daemonp)
+  (exec-path-from-shell-initialize))
+
+(exec-path-from-shell-initialize)
+
+(use-package fancy-compilation
+  :ensure t
+  :config (fancy-compilation-mode)
+  (setq fancy-compilation-term "xterm")
+  ;; (setq fancy-compilation-override-colors nil)
+  )
+
 (use-package page-break-lines
   :ensure t
   :config (global-page-break-lines-mode))
@@ -447,29 +475,29 @@
 (if (daemonp)
     (pdf-tools-install))
 
-;; (use-package popper
-;;   :ensure t
-;;   :bind (("C-S-p"   . popper-toggle-latest)
-;; 	 ("C-S-z"   . popper-cycle)
-;; 	 ("C-M-`" . popper-toggle-type))
-;;   :config
-;;   (setq popper-reference-buffers
-;; 	'("\\*Async Shell Command\\*"
-;; 	  ;; "\\*elfeed-search\\*"
-;; 	  "\\*julia\\*"
-;; 	  "\\*vterm\\*"
-;; 	  "\\*eldoc\\*"
-;; 	  "\\*Shell Command Output\\*"
-;; 	  "\\*Async Shell Command Output\\*"
-;; 	  Man-mode
-;; 	  eldoc-mode
-;; 	  help-mode
-;; 	  compilation-mode
-;; 	  pdf-outline-buffer-mode))
-;;   (popper-mode +1)
-;;   (popper-echo-mode +1)
-;;   (setq popper-group-function #'popper-group-by-project)
-;;   :custom (popper-mode-line nil))
+(use-package popper
+  :ensure t
+  :bind (("C-S-p"   . popper-toggle-latest)
+	 ("C-S-z"   . popper-cycle)
+	 ("C-M-`" . popper-toggle-type))
+  :config
+  (setq popper-reference-buffers
+	'("\\*Async Shell Command\\*"
+	  ;; "\\*elfeed-search\\*"
+	  "\\*julia\\*"
+	  "\\*vterm\\*"
+	  "\\*eldoc\\*"
+	  "\\*Shell Command Output\\*"
+	  "\\*Async Shell Command Output\\*"
+	  Man-mode
+	  eldoc-mode
+	  help-mode
+	  compilation-mode
+	  pdf-outline-buffer-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1)
+  (setq popper-group-function #'popper-group-by-project)
+  :custom (popper-mode-line nil))
 
 (use-package pulsar
   :ensure t
@@ -551,4 +579,3 @@
   :config
   (setq gnugo-xpms 'gnugo-imgen-create-xpms)
   (setq gnugo-imgen-style 'ttn))
-(put 'dired-find-alternate-file 'disabled nil)
