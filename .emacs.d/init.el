@@ -26,11 +26,13 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-(set-fringe-mode '(0 . 0))
+;;(set-fringe-mode '(0 . 0))
+(set-fringe-mode '(5 . 5))
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'latex-mode-hook  #'display-line-numbers-mode)
+(add-hook 'LaTeX-mode-hook  #'display-line-numbers-mode)
 (global-set-key (kbd "C-x C-l") 'display-line-numbers)
 
 (setq tab-bar-close-button-show nil)
@@ -79,6 +81,7 @@
 (recentf-mode 1)
 (setq eldoc-echo-area-use-multiline-p nil)
 (setq ediff-window-setup-function #'ediff-setup-windows-plain)
+(setq ediff-split-window-function #'split-window-horizontally)
 
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "C-c C-g") 'global-whitespace-mode)
@@ -88,7 +91,7 @@
 
 (defun my-inhibit-startup-screen-always ()
   "Startup screen inhibitor for `command-line-functions`.
-	  Inhibits startup screen on the first unrecognised option."
+	    Inhibits startup screen on the first unrecognised option."
   (ignore (setq inhibit-startup-screen t)))
 
 (add-hook 'command-line-functions #'my-inhibit-startup-screen-always)
@@ -107,28 +110,48 @@
 
 (add-hook 'eshell-mode-hook (lambda () (setenv "TERM" "xterm")))
 
-(setq compile-command "make -j 8")
+(setq compile-command "make -j $(nproc)")
 
-;; (defun my-font-config (frame) (progn
-  ;; 				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
-  ;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-  ;; 				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
-  (defun my-font-config (frame) (progn
-				  (set-face-attribute 'fixed-pitch nil :font "Cascadia Code PL-8")
-				  (set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
-				  (set-face-attribute 'default nil :font "Cascadia Code PL-8")))
+(global-set-key (kbd "C-x p C-s") 'vc-git-grep)
+(global-set-key (kbd "C-x p M-s") 'consult-git-grep)
 
-(my-font-config nil)
+(global-set-key (kbd "C-M-i") 'company-complete)
+(setq-default mode-line-end-spaces nil)
 
-  (if (daemonp)
-      (add-hook 'after-make-frame-functions #'my-font-config)
-    (my-font-config nil))
+;;(custom-set-faces
+;; '(default ((t (:family "Inconsolata SemiCondensed" :foundry "CYRE" :slant normal :weight medium :height 90 :width semi-condensed)))))
 
-  ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
-  ;; (setq highlight-indent-guides-method 'character)
-  (savehist-mode 1)
+;;(custom-set-faces
+;; '(default ((t (:family "Hack" :foundry "SRC" :slant normal :weight regular :height 68 :width normal)))))
 
-  (subword-mode)
+
+(custom-set-faces
+ '(default ((t (:family "Cascadia Code" :foundry "SAJA" :slant normal :weight semi-light :height 68 :width normal)))))
+
+;; (custom-set-faces
+;;  '(default ((t (:family "Iosevka Comfy" :foundry "UKWN" :slant normal :weight regular :height 75 :width normal)))))
+
+
+    ;; (defun my-font-config (frame) (progn
+    ;; 				(set-face-attribute 'fixed-pitch nil :font "Iosevka Comfy-9")
+    ;; 				(set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+    ;; 				(set-face-attribute 'default nil :font "Iosevka Comfy-9")))
+  ;;   (defun my-font-config (frame) (progn
+  ;; 				  (set-face-attribute 'fixed-pitch nil :font "Cascadia Code PL-8")
+  ;; 				  (set-face-attribute 'variable-pitch nil :font "Ubuntu-9")
+  ;; 				  (set-face-attribute 'default nil :font "Cascadia Code PL-8")))
+
+  ;; (my-font-config nil)
+
+  ;;   (if (daemonp)
+  ;;       (add-hook 'after-make-frame-functions #'my-font-config)
+  ;;     (my-font-config nil))
+
+    ;; (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+    ;; (setq highlight-indent-guides-method 'character)
+    (savehist-mode 1)
+
+    (subword-mode)
 
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 ;; (use-package irony
@@ -136,6 +159,10 @@
 ;;   :config
 ;;   (add-hook 'c++-mode-hook 'irony-mode)
 ;;   (add-hook 'c-mode-hook 'irony-mode))
+
+(use-package opencl-mode
+  :ensure t)
+(add-to-list 'auto-mode-alist '("\\.cl\\'" . opencl-mode))
 
 (setq vc-follow-symlinks t)
 
@@ -151,67 +178,75 @@
   :config (add-to-list 'load-path "/usr/bin/julia")
   :hook (julia-mode . julia-repl-mode))
 
-(use-package all-the-icons
-  :ensure t
-  :config (setq all-the-icons-scale-factor 1.0)
-	  (setq all-the-icons-fileicon-scale-factor 1.0))
+(when (display-graphic-p)
+  (use-package all-the-icons
+    :ensure t
+    :config (setq all-the-icons-scale-factor 0.8)
+	    (setq all-the-icons-fileicon-scale-factor 0.8)))
 
-(use-package all-the-icons-ibuffer
-  :ensure t
-  :hook (ibuffer-mode . all-the-icons-ibuffer-mode))
+(when (display-graphic-p)
+      (use-package all-the-icons-ibuffer
+	:ensure t
+	:hook (ibuffer-mode . all-the-icons-ibuffer-mode))
 
-(use-package all-the-icons-dired
-  :ensure t
-  :config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
+      (use-package all-the-icons-dired
+	:ensure t
+	:config (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-(use-package all-the-icons-completion
-  :ensure t
-  :config (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup))
+      (use-package all-the-icons-completion
+	:ensure t
+	:config (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)))
 
-(use-package doom-modeline
-  :ensure t
-  :config (doom-modeline-mode 1)
-  :config (setq doom-modeline-height 18)
-  ;; :config (setq doom-modeline-icon nil)
-  (setq doom-modeline-buffer-file-name-style 'relative-from-project))
+;; (when (display-graphic-p)
+;;   (use-package doom-modeline
+;;     :ensure t
+;;     :config (doom-modeline-mode 1)
+;;     :config (setq doom-modeline-height 18)
+;;     ;; :config (setq doom-modeline-icon nil)
+;;     (setq doom-modeline-buffer-file-name-style 'relative-from-project)))
 
-(use-package corfu
+(use-package company
   :ensure t
-  ;; Optional customizations
-  :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-  :bind
-  ;; Configure SPC for separator insertion
-  (:map corfu-map ("SPC" . corfu-insert-separator)
-	("M-p" . corfu-doc-scroll-down)
-	("M-n" . corfu-doc-scroll-up)
-	("M-d" . corfu-doc-toggle))
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+  :init
+  (global-company-mode))
 
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :config
-  (global-corfu-mode))
-;; (use-package kind-icon
+;; (use-package corfu
 ;;   :ensure t
-;;   :after corfu
+;;   ;; Optional customizations
 ;;   :custom
-;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+;;   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-auto t)                 ;; Enable auto completion
+;;   ;; (corfu-separator ?\s)          ;; Orderless field separator
+;;   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   ;; (corfu-preselect-first nil)    ;; Disable candidate preselection
+;;   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+;;   ;; (corfu-echo-documentation nil) ;; Disable documentation in the echo area
+;;   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+;;   :bind
+;;   ;; Configure SPC for separator insertion
+;;   (:map corfu-map ("SPC" . corfu-insert-separator)
+;; 	("M-p" . corfu-doc-scroll-down)
+;; 	("M-n" . corfu-doc-scroll-up)
+;; 	("M-d" . corfu-doc-toggle))
+;;   ;; Enable Corfu only for certain modes.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
+
+;;   ;; Recommended: Enable Corfu globally.
+;;   ;; This is recommended since Dabbrev can be used globally (M-/).
+;;   ;; See also `corfu-excluded-modes'.
 ;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+;;   (global-corfu-mode))
+;; ;; (use-package kind-icon
+;; ;;   :ensure t
+;; ;;   :after corfu
+;; ;;   :custom
+;; ;;   (kind-icon-default-face 'corfu-default) ; to compute blended backgrounds correctly
+;; ;;   :config
+;; ;;   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package embark
   :ensure t
@@ -247,6 +282,9 @@
   :bind (("M-A" . marginalia-cycle)
 	 :map minibuffer-local-map
 	 ("M-A" . marginalia-cycle))
+  :config
+  (setq marginalia-max-relative-age 0)
+  (setq marginalia-align 'center)
   :init (marginalia-mode))
 
 (use-package orderless
@@ -260,27 +298,53 @@
   :ensure t)
 
 (use-package org
-  :ensure t
-  :hook (org-mode . org-bullets-mode)
-  :config (setq org-agenda-files '("~/org/"))
-  (setq org-agenda-start-with-log-mode t)
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
-  (setq org-ellipsis " ")
-  (setq org-src-fontify-natively t)
-  (setq org-highlight-latex-and-related '(latex script entities))
-  (setq org-format-latex-options (plist-put org-format-latex-options :scale 2.0))
-  :bind ("C-c l" . org-store-link)
-  ("C-c a" . org-agenda)
-  ("C-c c" . org-capture))
+    :ensure t
+    :hook (org-mode . org-bullets-mode)
+    :config (setq org-agenda-files '("~/org/"))
+    (setq org-agenda-start-with-log-mode t)
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+    (setq org-ellipsis " ")
+    (setq org-src-fontify-natively t)
+    (setq org-highlight-latex-and-related '(latex script entities))
+    (setq org-format-latex-options (plist-put org-format-latex-options :scale 0.18))
+    :bind ("C-c l" . org-store-link)
+    ("C-c a" . org-agenda)
+    ("C-c c" . org-capture))
 
-;; (if (daemonp)
-;;     (setq initial-major-mode 'org-mode))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)
+     (julia . t)))
 
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (julia . t)))
+(setq org-preview-latex-default-process 'dvisvgm)
+(setq org-format-latex-options (plist-put org-format-latex-options :scale 0.18))
+(plist-put org-format-latex-options :background "Transparent")
+
+(defun my/text-scale-adjust-latex-previews ()
+  "Adjust the size of latex preview fragments when changing the
+buffer's text scale."
+  (pcase major-mode
+    ('latex-mode
+     (dolist (ov (overlays-in (point-min) (point-max)))
+       (if (eq (overlay-get ov 'category)
+               'preview-overlay)
+           (my/text-scale--resize-fragment ov))))
+    ('org-mode
+     (dolist (ov (overlays-in (point-min) (point-max)))
+       (if (eq (overlay-get ov 'org-overlay-type)
+               'org-latex-overlay)
+           (my/text-scale--resize-fragment ov))))))
+
+(defun my/text-scale--resize-fragment (ov)
+  (overlay-put
+   ov 'display
+   (cons 'image
+         (plist-put
+          (cdr (overlay-get ov 'display))
+          :scale (+ 1.0 (* 0.25 text-scale-mode-amount))))))
+
+(add-hook 'text-scale-mode-hook #'my/text-scale-adjust-latex-previews)
 
 (use-package htmlize
   :ensure t)
@@ -289,34 +353,43 @@
   :ensure t
   :config (setq elfeed-show-entry-switch 'display-buffer))
 
+(custom-set-variables
+ '(elfeed-feeds
+   '("https://karthinks.com/index.xml" "https://www.brendangregg.com/blog/rss.xml" "https://quuxplusone.github.io/blog/feed.xml" "https://protesilaos.com/codelog.xml" "https://awesomekling.github.io/feed.xml" "https://andrewkelley.me/rss.xml" "https://floooh.github.io/feed.xml")))
+
 (use-package doom-themes
-  :ensure t)
+     :ensure t)
 
-;; (load-theme 'ef-light)
+   ;; (load-theme 'ef-light)
 
-;; (custom-theme-set-faces
-;;  'ef-light
-;;  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "#065fff" :style flat-button)))))
-;;  '(mode-line-inactive ((t (:background "#dbdbdb" :foreground "#70627f" :box (:line-width (1 . 1) :color "#dbdbdb" :style flat-button)))))
-;;  '(doom-modeline-bar-inactive ((t (:background "#dbdbdb"))))
-;;  '(doom-modeline-bar ((t (:background "#b7c7ff")))))
-;; ;; (load-theme 'ef-light)
+   ;; (custom-theme-set-faces
+   ;;  'ef-light
+   ;;  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "#065fff" :style flat-button)))))
+   ;;  '(mode-line-inactive ((t (:background "#dbdbdb" :foreground "#70627f" :box (:line-width (1 . 1) :color "#dbdbdb" :style flat-button)))))
+   ;;  '(doom-modeline-bar-inactive ((t (:background "#dbdbdb"))))
+   ;;  '(doom-modeline-bar ((t (:background "#b7c7ff")))))
+   ;; ;; (load-theme 'ef-light)
 
-;; (enable-theme 'ef-light)
+   ;; (enable-theme 'ef-light)
 
-(load-theme 'doom-ir-black)
+   (load-theme 'doom-ir-black)
 (custom-theme-set-faces
  'doom-ir-black
  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
- '(font-lock-comment-face ((t (:foreground "grey60" :slant oblique))))
+ '(font-lock-comment-face ((t (:foreground "#cf9f8f" :slant oblique))))
+ '(font-lock-doc-face ((t (:foreground "#cdf25e" :slant oblique))))
+ ;; '(font-lock-doc-face ((t (:foreground "#98d9fa" :slant oblique))))
+ ;; '(font-lock-comment-face ((t (:foreground "grey60" :slant oblique))))
  '(font-lock-function-name-face ((t (:foreground "#d0b9f0"))))
  '(doom-modeline-bar ((t (:background "grey15"))))
  '(doom-modeline-persp-name ((t (:foreground "#99CC99" :slant normal))))
  '(doom-modeline-persp-buffer-not-in-persp ((t (:foreground "#83898d" :slant normal))))
  '(mode-line ((t (:background "grey15" :foreground "#ffffff" :box nil))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
- '(line-number-current-line ((t (:foreground "white" :background "grey6"))))
- '(line-number ((t (:foreground "#5B6268" :background "grey6"))))
+ ;; '(line-number-current-line ((t (:foreground "white" :background "grey6"))))
+ ;; '(line-number ((t (:foreground "#5B6268" :background "grey6"))))
+ '(line-number-current-line ((t (:foreground "white"))))
+ '(line-number ((t (:foreground "#5B6268"))))
  '(org-block ((t (:extend t :background "grey5"))))
  '(diff-removed ((t (:background "#2b0000" :foreground "#cc564c"))))
  '(diff-added ((t (:background "#1d2e10" :foreground "#A8FF60"))))
@@ -344,11 +417,14 @@
  '(mode-line-active ((t (:inherit mode-line :box (:line-width (1 . 1) :color "grey34" :style flat-button)))))
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box (:line-width (1 . 1) :color "gray6" :style flat-button)))))
  '(isearch ((t (:background "#fac200" :foreground "#000000"))))
- '(font-lock-preprocessor-face ((t (:foreground "coral"))))
+ ;; '(font-lock-preprocessor-face ((t (:foreground "coral"))))
  '(font-lock-string-face ((t (:foreground "SkyBlue1"))))
- '(font-lock-variable-name-face ((t (:foreground "aquamarine3")))))
+ '(font-lock-variable-name-face ((t (:foreground "aquamarine3"))))
+ '(company-tooltip-selection ((t (:background "grey21" :foreground "SkyBlue1" :weight bold))))
+ '(company-tooltip-scrollbar-track ((t (:background "grey15"))))
+ '(font-lock-builtin-face ((t (:foreground "pink1")))))
 
-(enable-theme 'doom-ir-black)
+   (enable-theme 'doom-ir-black)
 
 (use-package autothemer
   :ensure t)
@@ -427,8 +503,10 @@
 (use-package eglot
   :ensure t
   :config
-  (add-to-list 'eglot-server-programs '((c++-mode c-mode) "clangd"))
+  (add-to-list 'eglot-server-programs '((c++-mode c-mode) . ("clangd"
+							     "--header-insertion=never")))
   (add-to-list 'eglot-server-programs '(zig-mode . ("zls")))
+  (add-hook 'python-mode 'eglot-ensure)
   (add-hook 'c-mode-hook 'eglot-ensure)
   (add-hook 'c++-mode-hook 'eglot-ensure)
   ;; (add-hook 'julia-mode-hook 'my-julia-init)
@@ -483,15 +561,13 @@
   :config
   (setq popper-reference-buffers
 	'("\\*Async Shell Command\\*"
-	  ;; "\\*elfeed-search\\*"
 	  "\\*julia\\*"
 	  "\\*vterm\\*"
-	  "\\*eldoc\\*"
 	  "\\*Shell Command Output\\*"
 	  "\\*Async Shell Command Output\\*"
-	  Man-mode
-	  eldoc-mode
+	  ;; Man-mode
 	  help-mode
+	  eshell-mode
 	  compilation-mode
 	  pdf-outline-buffer-mode))
   (popper-mode +1)
@@ -505,6 +581,7 @@
 	  (setq pulsar-face 'pulsar-cyan)
 	  (setq pulsar-delay 0.05)
   :custom (pulsar-pulse-functions '(other-window
+				    occur-mode-goto-occurrence
 				    windmove-do-window-select
 				    mouse-set-point
 				    mouse-select-window
