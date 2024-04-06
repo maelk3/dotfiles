@@ -27,7 +27,7 @@
 (setq font-latex-fontify-script nil)
 
 ;;(set-fringe-mode '(0 . 0))
-(set-fringe-mode '(5 . 5))
+(set-fringe-mode '(5 . 10))
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -99,7 +99,7 @@
 (setq isearch-lazy-count t)
 (setq lazy-count-prefix-format "(%s/%s) ")
 (setq lazy-count-suffix-format nil)
-(setq search-whitespace-regexp ".*?")
+;;(setq search-whitespace-regexp ".*?")
 
 (setq set-mark-command-repeat-pop t)
 
@@ -127,6 +127,9 @@
 
 (custom-set-faces
  '(default ((t (:family "Cascadia Code" :foundry "SAJA" :slant normal :weight semi-light :height 68 :width normal)))))
+
+(custom-set-faces
+ '(variable-pitch ((t (:font "Ubuntu-9")))))
 
 ;; (custom-set-faces
 ;;  '(default ((t (:family "Iosevka Comfy" :foundry "UKWN" :slant normal :weight regular :height 75 :width normal)))))
@@ -197,18 +200,25 @@
 	:ensure t
 	:config (add-hook 'marginalia-mode-hook #'all-the-icons-completion-marginalia-setup)))
 
-;; (when (display-graphic-p)
-;;   (use-package doom-modeline
-;;     :ensure t
-;;     :config (doom-modeline-mode 1)
-;;     :config (setq doom-modeline-height 18)
-;;     ;; :config (setq doom-modeline-icon nil)
-;;     (setq doom-modeline-buffer-file-name-style 'relative-from-project)))
+(when (display-graphic-p)
+  (use-package doom-modeline
+    :ensure t
+    :config (doom-modeline-mode 1)
+    :config (setq doom-modeline-height 16)
+    ;; :config (setq doom-modeline-icon nil)
+    (setq doom-modeline-buffer-file-name-style 'relative-from-project)))
 
 (use-package company
-  :ensure t
-  :init
-  (global-company-mode))
+    :ensure t
+    :init
+    (global-company-mode))
+
+(use-package company-quickhelp
+  :ensure t)
+
+(add-hook 'company-search-mode
+    (lambda ()
+	(define-key company-mode-map (kbd "C-h C-h") 'company-complete-quick-access)))
 
 ;; (use-package corfu
 ;;   :ensure t
@@ -377,8 +387,9 @@ buffer's text scale."
  'doom-ir-black
  '(doom-modeline-bar-inactive ((t (:background "grey6"))))
  '(font-lock-comment-face ((t (:foreground "#cf9f8f" :slant oblique))))
- '(font-lock-doc-face ((t (:foreground "#cdf25e" :slant oblique))))
+ ;; '(font-lock-doc-face ((t (:foreground "#cdf25e" :slant oblique))))
  ;; '(font-lock-doc-face ((t (:foreground "#98d9fa" :slant oblique))))
+ '(font-lock-doc-face ((t (:foreground "#96cbfe" :slant oblique))))
  ;; '(font-lock-comment-face ((t (:foreground "grey60" :slant oblique))))
  '(font-lock-function-name-face ((t (:foreground "#d0b9f0"))))
  '(doom-modeline-bar ((t (:background "grey15"))))
@@ -388,9 +399,11 @@ buffer's text scale."
  '(mode-line-inactive ((t (:background "gray6" :foreground "#5B6268" :box nil))))
  ;; '(line-number-current-line ((t (:foreground "white" :background "grey6"))))
  ;; '(line-number ((t (:foreground "#5B6268" :background "grey6"))))
- '(line-number-current-line ((t (:foreground "white"))))
+ '(line-number-current-line ((t (:foreground "white" :background "#121212" :weight bold))))
  '(line-number ((t (:foreground "#5B6268"))))
  '(org-block ((t (:extend t :background "grey5"))))
+ ;; '(font-lock-type-face ((t (:foreground "#FFFFB6" :slant oblique))))
+ '(font-lock-type-face ((t (:foreground "#FFFFB6"))))
  '(diff-removed ((t (:background "#2b0000" :foreground "#cc564c"))))
  '(diff-added ((t (:background "#1d2e10" :foreground "#A8FF60"))))
  '(diff-refine-added ((t (:foreground "#A8FF60" :background "#213313" :weight bold))))
@@ -422,7 +435,19 @@ buffer's text scale."
  '(font-lock-variable-name-face ((t (:foreground "aquamarine3"))))
  '(company-tooltip-selection ((t (:background "grey21" :foreground "SkyBlue1" :weight bold))))
  '(company-tooltip-scrollbar-track ((t (:background "grey15"))))
- '(font-lock-builtin-face ((t (:foreground "pink1")))))
+ '(font-lock-builtin-face ((t (:foreground "pink1"))))
+ '(ansi-color-magenta ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))
+ '(ansi-color-bright-magenta ((t (:foreground "#ffabfb" :background "#ffabfb"))))
+ '(ansi-color-blue ((t (:foreground "#96cbfe" :background "#96cbfe"))))
+ '(ansi-color-bright-blue ((t (:foreground "#96cbfe" :background "#96cbfe"))))
+ '(ansi-color-green ((t (:foreground "#99CC99" :background "#99CC99"))))
+ '(ansi-color-bright-green ((t (:foreground "#A8FF60" :background "#A8FF60"))))
+ '(ansi-color-yellow ((t (:foreground "wheat2" :background "wheat2"))))
+ '(ansi-color-bright-yellow ((t (:foreground "wheat2" :background "wheat2"))))
+ '(ansi-color-red ((t (:foreground "#ff6c60" :background "#ff6c60"))))
+ '(ansi-color-bright-red ((t (:foreground "#cc564c" :background "#cc564c"))))
+ '(ansi-color-cyan ((t (:foreground "#a9a1e1" :background "#a9a1e1"))))
+ '(ansi-color-bright-cyan ((t (:foreground "#a9a1e1" :background "#a9a1e1")))))
 
    (enable-theme 'doom-ir-black)
 
@@ -563,6 +588,7 @@ buffer's text scale."
 	'("\\*Async Shell Command\\*"
 	  "\\*julia\\*"
 	  "\\*vterm\\*"
+	  "\\*eldoc\\*"
 	  "\\*Shell Command Output\\*"
 	  "\\*Async Shell Command Output\\*"
 	  ;; Man-mode
@@ -578,20 +604,23 @@ buffer's text scale."
 (use-package pulsar
   :ensure t
   :config ;; (pulsar-global-mode 1)
-	  (setq pulsar-face 'pulsar-cyan)
+	  ;; (setq pulsar-pulse nil)
+	  (setq pulsar-face 'pulsar-red)
 	  (setq pulsar-delay 0.05)
-  :custom (pulsar-pulse-functions '(other-window
+	  (add-hook 'next-error-hook #'pulsar-pulse-line)
+  :custom (pulsar-pulse-functions '(;; other-window
 				    occur-mode-goto-occurrence
-				    windmove-do-window-select
-				    mouse-set-point
-				    mouse-select-window
-				    scroll-up-command
-				    scroll-down-command
-				    recenter-top-bottom
+				    ;; windmove-do-window-select
+				    ;; mouse-set-point
+				    ;; mouse-select-window
+				    ;; scroll-up-command
+				    ;; scroll-down-command
+				    ;; recenter-top-bottom
 				    isearch-repeat-forward
 				    isearch-repeat-backward
-				    beginning-of-buffer
-				    end-of-buffer)))
+				    ;; beginning-of-buffer
+				    ;; end-of-buffer
+				    )))
 
 (use-package vterm
   :ensure t
