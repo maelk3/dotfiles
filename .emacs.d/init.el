@@ -26,8 +26,8 @@
 (setq tex-fontify-script nil)
 (setq font-latex-fontify-script nil)
 
-;;(set-fringe-mode '(0 . 0))
-(set-fringe-mode '(5 . 10))
+(set-fringe-mode '(0 . 0))
+;; (set-fringe-mode '(5 . 10))
 
 (add-hook 'plain-TeX-mode-hook 'LaTeX-mode)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
@@ -685,3 +685,4 @@ buffer's text scale."
   :config
   (setq gnugo-xpms 'gnugo-imgen-create-xpms)
   (setq gnugo-imgen-style 'ttn))
+(put 'dired-find-alternate-file 'disabled nil)
