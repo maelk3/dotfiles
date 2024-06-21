@@ -1,3 +1,4 @@
-* My Arch Linux dotfiles
+* My Linux dotfiles
 
 [[file:screenshot.png]]
+[[file:screenshot1.png]]
