@@ -670,11 +670,29 @@ buffer's text scale."
 ;;   (global-set-key (kbd "M-f") 'my/windmove-right)
 ;;   (global-set-key (kbd "M-b") 'my/windmove-left)
 
-  (global-set-key (kbd "M-N") 'flip-frame)
-  (global-set-key (kbd "M-P") 'flip-frame)
-  (global-set-key (kbd "M-F") 'flop-frame)
-  (global-set-key (kbd "M-B") 'flop-frame)
-  (global-set-key (kbd "M-R") 'transpose-frame)
+(global-set-key (kbd "M-N") 'flip-frame)
+(global-set-key (kbd "M-P") 'flip-frame)
+(global-set-key (kbd "M-F") 'flop-frame)
+(global-set-key (kbd "M-B") 'flop-frame)
+(global-set-key (kbd "M-R") 'transpose-frame)
+
+(defun move-line-up ()
+  "Move up the current line."
+  (interactive)
+  (transpose-lines 1)
+  (forward-line -2)
+  (indent-according-to-mode))
+
+(defun move-line-down ()
+  "Move down the current line."
+  (interactive)
+  (forward-line 1)
+  (transpose-lines 1)
+  (forward-line -1)
+  (indent-according-to-mode))
+
+(global-set-key (kbd "M-p") 'move-line-up)
+(global-set-key (kbd "M-n") 'move-line-down)
 
 (use-package xclip
   :ensure t
