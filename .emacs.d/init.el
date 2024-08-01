@@ -154,7 +154,7 @@
     ;; (setq highlight-indent-guides-method 'character)
     (savehist-mode 1)
 
-    (subword-mode)
+    (global-subword-mode 1)
 
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 ;; (use-package irony
