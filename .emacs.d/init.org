@@ -209,7 +209,7 @@ We also disable the close button for emacs tabs.
     ;; (setq highlight-indent-guides-method 'character)
     (savehist-mode 1)
 
-    (subword-mode)
+    (global-subword-mode 1)
 #+end_src
 
 * Package specific configuration
